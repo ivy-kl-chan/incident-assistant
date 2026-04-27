@@ -19,7 +19,7 @@
 ### Pagination (list)
 
 - `page` (0-based, default `0`), `size` (default `20`, max `100`).
-- **Unknown query key** → **`400`**. Bad `size` / `page` → **`400`**.
+- **Unknown query key** → **`400`** (includes **`source`** and any other key not listed for this phase). Bad `size` / `page` → **`400`**.
 
 ### Correlation
 
@@ -33,10 +33,14 @@
 
 - Document if not implemented. Recommended: **~120 mutating req/min** per IP for demo.
 
+### JSON and `Content-Type` (1a)
+
+- **`POST`**, **`PATCH`**, **`POST .../transitions`**: body MUST be **`application/json`**. Wrong or missing JSON `Content-Type` where a JSON body is expected → **`415`** (or **`400`** if server documents unified validation).
+- **`PATCH`** with **empty body** or **non-object JSON** (when object expected) → **`400`**.
+
 ### Optimistic concurrency (**required**)
 
-- **`GET /api/v1/incidents/{id}`** returns **`ETag: "{version}"`**.
-- **`PATCH`**, **`POST .../transitions`** require **`If-Match`**. Mismatch → **`412`**.
+- **`GET /api/v1/incidents/{id}`** returns a **strong `ETag`** (RFC 9110): the entity-tag is a **quoted** opaque string derived from `version`. Normative wire format: ASCII **`"`** + decimal string of `version` + **`"`** (example: **`ETag: "7"`**). Same token is sent on **`If-Match`** for **`PATCH`** and **`POST .../transitions`**; mismatch → **`412`**. **`If-Match: *`** is **not** supported unless documented in an ADR.
 
 ### Idempotency (1a)
 
@@ -61,11 +65,13 @@
 
 **Query filters:** `status` (comma-separated), `sort` (`createdAt,asc` \| `createdAt,desc`).
 
-**`source` query (1a):** **Omit** or use **`source=MANUAL` only**; **`source=SIGNAL`** → **`400`** (not available until 1b).
+**No `source` query in 1a:** list returns **manual** incidents only (`source` on each item is always **`MANUAL`**). Filtering by **`SIGNAL`** is **`phase-1b-signal-ingest/api-contract.md`**.
 
-**Invalid `status` tokens** → **`400`**.
+**`status`:** trim tokens; **empty** token, **duplicates** after trim, or **unknown** enum → **`400`**.
 
 **Response:** paged JSON `{ "items", "page", "size", "totalElements", "totalPages" }`.
+
+**Availability:** if the persistence layer is unavailable for the list path, respond **`503`** (preferred) or **`500`** — document which.
 
 ---
 
@@ -99,6 +105,7 @@
 ## `PATCH /api/v1/incidents/{id}`
 
 - **`If-Match`** required.
+- JSON body must be a **non-empty object** with at least one of `title`, `description`, `severity` (all optional keys absent or empty patch → **`400`**).
 - `title`, `description`, `severity` when status `DRAFT` or `OPEN`; else **`409`**.
 
 ---

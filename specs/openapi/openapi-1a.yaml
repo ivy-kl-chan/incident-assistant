@@ -13,7 +13,7 @@ paths:
   /api/v1/incidents:
     get:
       tags: [Incidents]
-      summary: List incidents (1a; MANUAL only for source in strict 1a)
+      summary: List incidents (1a; items are manual-only; no source filter)
       parameters:
         - in: query
           name: page
@@ -25,9 +25,6 @@ paths:
           name: status
           schema: { type: string }
         - in: query
-          name: source
-          schema: { type: string, enum: [MANUAL] }
-        - in: query
           name: sort
           schema:
             type: string
@@ -36,6 +33,7 @@ paths:
       responses:
         "200": { description: Paged IncidentSummary }
         "400": { description: Bad query }
+        "503": { description: Persistence unavailable }
     post:
       tags: [Incidents]
       summary: Create incident (DRAFT, MANUAL)
@@ -43,6 +41,7 @@ paths:
         "201": { description: Created }
         "400": { description: Validation }
         "413": { description: Payload too large }
+        "415": { description: Unsupported media type }
   /api/v1/incidents/{id}:
     get:
       tags: [Incidents]
@@ -58,9 +57,11 @@ paths:
         - $ref: "#/components/parameters/IfMatch"
       responses:
         "200": { description: OK }
+        "400": { description: Empty or invalid patch body }
         "404": { description: Not found }
         "409": { description: Not editable }
         "412": { description: Stale If-Match }
+        "415": { description: Unsupported media type }
   /api/v1/incidents/{id}/transitions:
     post:
       tags: [Incidents]
@@ -69,9 +70,11 @@ paths:
         - $ref: "#/components/parameters/IfMatch"
       responses:
         "200": { description: OK }
+        "400": { description: Invalid body }
         "404": { description: Not found }
         "409": { description: Illegal transition }
         "412": { description: Stale }
+        "415": { description: Unsupported media type }
   /actuator/health:
     get:
       tags: [Health]

@@ -5,7 +5,7 @@
 ## Purpose
 
 - **Spring Boot 3 / Java 21** monolith: **incidents** (manual create/edit), **draft → open → closed / cancelled** lifecycle, **versioned JSON API** + **OpenAPI**, **PostgreSQL** + **Docker Compose** (app + DB only).
-- **No** OpenTelemetry Demo dependency in default CI, **no** LLM, **no** RAG, **no** signal ingest **endpoint** (may ship **stub Spring profile** with route **unregistered** or **404**—see `api-contract.md`).
+- **No** OpenTelemetry Demo dependency in default CI, **no** LLM, **no** RAG, **no** signal ingest **route** (controller not registered; path does not exist). **404** on ingest when `signals.enabled=false` is **Phase 1b** only.
 
 ## In scope (1a)
 
@@ -21,7 +21,7 @@
 ## Out of scope (1a) — do not implement here
 
 - **`POST /api/v1/signal-ingest/*`** and **rule engine** (Phase **1b**).
-- **Columns / tables** for `signal_fingerprint`, `created_by_rule_id`, `telemetry_context` **unless** you choose a single migration for both phases (see `implementation-plan.md` note; **normative 1a model** in `data-model.md` is **without** those fields in the *logical* 1a deliverable; DB may pre-add null columns only if documented as “reserved for 1b” in ADR).
+- **Using** `signal_fingerprint`, `created_by_rule_id`, `telemetry_context`, or **`SIGNAL`** rows in the API — **1b**. The **physical** DB may still include **nullable** columns from the shared **`V1`** baseline (see `data-model.md`); **1a** logic ignores them.
 
 ## Canonical decisions (1a — ADR to override)
 
@@ -39,7 +39,7 @@
 | File | Role |
 |------|------|
 | `api-contract.md` | Incidents + Actuator; **1a-only** request/response shapes |
-| `data-model.md` | `incidents` table **without** signal-specific columns in logical model |
+| `data-model.md` | `incidents` physical **`V1`** shape (1a use + null 1b columns) |
 | `test-plan.md` | Unit + integration for incidents only |
 | `implementation-plan.md` | M1–M4 / gate 1a |
 | `review-notes.md` | 1a review notes |

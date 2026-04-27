@@ -22,7 +22,7 @@
 ### Integration
 
 - `POST` → `GET` with `ETag`; `PATCH` success/failure; `transitions` with `If-Match`.
-- List: pagination, bad query → **400**; `source=SIGNAL` on list → **400** in **1a-only** build.
+- List: pagination, bad query → **400**; unknown query key (e.g. **`source`**) → **400**; verify OpenAPI has **no** `source` parameter.
 - `GET` unknown id → **404**.
 - Flyway migration on empty DB; forward-only.
 

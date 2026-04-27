@@ -1,0 +1,25 @@
+# Rule registry — Phase 1b (normative)
+# Load this file at startup. Every accepted `ruleId` on ingest MUST appear here.
+# Match logic stays in application code (deterministic); this file is metadata + stable ids.
+
+version: 1
+rules:
+  - id: "demo.otel.signal_v1"
+    description: >
+      Minimal demonstration rule for CI fixtures and OpenTelemetry Demo walkthrough.
+      Unit tests assert match/no-match against fixed SignalEvaluationRequest payloads.
+      Convention: tests may set fingerprintInputs.match = true to force a match without OTel.
+    severityOnCreate: "SEV3"
+    titlePrefix: "[Signal]"
+    matchSemantics: >
+      Matches if fingerprintInputs.match is boolean true (CI) OR fingerprintInputs.metric
+      equals "demo.synthetic". Otherwise evaluate to not matched.
+
+  - id: "demo.stub.always_false_v1"
+    description: >
+      Second shipped rule to prove pluggable evaluation: default implementation returns
+      matched=false for every payload (use in tests for unknown-path vs this known no-op rule).
+    severityOnCreate: "SEV4"
+    titlePrefix: "[Stub]"
+    matchSemantics: >
+      Never matches in the reference implementation unless a test double replaces the evaluator.

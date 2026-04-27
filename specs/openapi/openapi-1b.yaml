@@ -13,16 +13,22 @@ paths:
   /api/v1/signal-ingest/evaluations:
     post:
       tags: [SignalIngest]
-      summary: Evaluate normalized signal
+      summary: Evaluate normalized signal (application/json required)
       security:
         - integrationToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, description: SignalEvaluationRequest per phase-1b api-contract.md }
       responses:
         "200": { description: Matched with dedup, not matched, or matched false }
         "201": { description: New DRAFT }
-        "400": { description: Bad request }
+        "400": { description: Bad request or unknown ruleId }
         "401": { description: Auth }
         "404": { description: signals.enabled=false or route not mounted }
         "413": { description: Payload }
+        "415": { description: Unsupported media type }
         "422": { description: Validation }
         "429": { description: Rate limited }
         "500": { description: Rule error }

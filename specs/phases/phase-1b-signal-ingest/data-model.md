@@ -1,10 +1,10 @@
 # Data model — Phase 1b (additive to 1a)
 
-**Prerequisites:** `../phase-1a-monolith-core/data-model.md` base `incidents` table.
+**Prerequisites:** `../phase-1a-monolith-core/data-model.md` — **same** physical **`incidents`** table (baseline **`V1`** migration already includes nullable signal columns and optional **`signal_ingest_audit`** per roadmap). **1b** turns on use of those columns; **no second versioned migration** is required for greenfield if **`V1`** was written to the combined shape.
 
-1b **adds** (migration `V2` or equivalent) — either new columns on `incidents` + optional `signal_ingest_audit`, or same in one step if 1a used “reserved nulls”.
+## Columns used by 1b on `incidents`
 
-## Additive columns: `incidents`
+Physical columns are created in **`V1`** (`../phase-1a-monolith-core/data-model.md`). This table is the **1b** semantics on those fields.
 
 | Column | Type | Notes |
 |--------|------|--------|
@@ -34,9 +34,30 @@ Same shape and validation as the prior monolithic spec:
 
 **Cooldown** `SIGNAL_DEDUP_COOLDOWN` default **15 minutes**.
 
-**Concurrency:** `pg_advisory_xact_lock` (PostgreSQL) around read-then-insert; integration test: parallel ingests same fingerprint → **one** new `DRAFT` when expected.
+**Concurrency:** within the transaction that applies the matrix below, take **`pg_advisory_xact_lock`** on a **64-bit key** derived from **`signal_fingerprint`** (e.g. two int halves of a hash) so parallel requests for the same fingerprint serialize.
 
-**Dedup lookup:** rows with same `signal_fingerprint` and `created_at` within `now() - cooldown` (see full algorithm in team ADR; behavior matches table).
+### Normative ingest algorithm (Option A, PostgreSQL)
+
+Let **`W`** = cooldown window from `SIGNAL_DEDUP_COOLDOWN`, **`fp`** = computed `signal_fingerprint`, **`t0`** = `observedAt` (for logging only unless ADR says otherwise), **`now()`** = DB transaction time.
+
+1. **Begin** transaction.
+2. **`pg_advisory_xact_lock`(derive_key(`fp`))`**.
+3. **Select** from `incidents` where `signal_fingerprint` = **`fp`** and `created_at` ≥ **`now()` − `W`**, order by `created_at` **desc**, limit **1** → row **`R`** (may be null).
+4. If **`R`** is null → **insert** new `DRAFT` with `source=SIGNAL`, set fingerprint + telemetry + rule id → **`201`** (body per `api-contract.md`).
+5. Else apply **matrix** (same `fp`, within **`W`**) using **`R.status`**:
+
+| `R.status` | Action |
+|------------|--------|
+| `DRAFT` | **`200`** duplicate → same `incidentId`, `reason: DUPLICATE_SIGNAL` |
+| `OPEN` | **`201`** new `DRAFT` (new episode) |
+| `CLOSED` | **`201`** new `DRAFT` |
+| `CANCELLED` | **`201`** new `DRAFT` |
+
+6. **Commit** transaction.
+
+**Integration test:** two parallel ingests (same **`fp`**, rule matched, empty pre-state) → **exactly one** new `DRAFT` row.
+
+**Dedup lookup (summary):** “in-window” means **`created_at` ≥ `now()` − `W`** for the same **`signal_fingerprint`**; “most recent” drives the matrix when multiple rows exist (step 3).
 
 ### `200` vs `201` matrix (second ingest, same `signal_fingerprint` within `W`, rule would match)
 
@@ -51,9 +72,9 @@ Same shape and validation as the prior monolithic spec:
 
 | Field | Source |
 |-------|--------|
-| `title` | `titlePrefix` from `rules/demo-rule-v1.yaml` + `serviceName` / fallback `[Signal] {ruleId}`; max **200** |
+| `title` | `titlePrefix` from **`rules/registry.yaml`** entry for `created_by_rule_id` + `serviceName` / fallback **`[Signal] {ruleId}`**; max **200** |
 | `description` | `summary` or null |
-| `severity` | `severityOnCreate` from registry (default `SEV3` for `demo.otel.signal_v1`) |
+| `severity` | `severityOnCreate` from **`rules/registry.yaml`** for the rule in use |
 | `source` | `SIGNAL` |
 
 ## Table: `signal_ingest_audit` (optional)
@@ -70,9 +91,9 @@ Same shape and validation as the prior monolithic spec:
 
 Store **hash** of payload, not raw body, if PII risk.
 
-## Indexes (add to 1a)
+## Indexes
 
-- `(signal_fingerprint, created_at DESC)` partial where fingerprint not null.
+- **`(signal_fingerprint, created_at DESC)`** partial where fingerprint is not null — same index referenced from **1a** `data-model.md` (**`V1`** DDL).
 
 ## Microservice note
 

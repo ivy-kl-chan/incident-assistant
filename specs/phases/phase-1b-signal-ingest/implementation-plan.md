@@ -3,14 +3,14 @@
 ## Preconditions
 
 - Phase **1a** gate passed (`../phase-1a-monolith-core/implementation-plan.md`).
-- ADR if 1a DB skipped 1b columns (then migration here adds all additive pieces).
+- **`V1`** baseline already includes nullable 1b columns + indexes (see **1a** `data-model.md`). If an older deployment omitted them, use a **one-time ADR** (out of scope for greenfield spec).
 
 ## Milestones (1b)
 
 | Step | Work |
 |------|------|
-| B1 | Flyway `V2` (or next): `created_by_rule_id`, `signal_fingerprint`, `telemetry_context`, audit table optional, indexes |
-| B2 | Rule registry load `rules/demo-rule-v1.yaml`; implement `demo.otel.signal_v1` |
+| B1 | Confirm DB matches **`data-model.md`** (columns, partial index, audit if used); **no** `V2` on greenfield |
+| B2 | Load **`rules/registry.yaml`**; implement evaluators for **each** shipped `ruleId` |
 | B3 | `POST /api/v1/signal-ingest/evaluations` + dedup + lock + `signals.enabled` |
 | B4 | Extend `GET` list/get for `SIGNAL` + optional fields |
 | B5 | `specs/openapi/openapi-1b.yaml` + README OTel/compose + smoke |

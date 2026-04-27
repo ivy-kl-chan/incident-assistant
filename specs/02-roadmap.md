@@ -45,7 +45,7 @@ Phases **6–7** are **stretch goals** for a portfolio narrative; they depend on
 
 - Runnable Spring Boot 3 / Java 21 app with health/readiness-style endpoints.
 - **Incident** domain: create/read/list and **draft lifecycle** (e.g. draft → acknowledged/promoted—exact states per implementation plan) with validation. **Manual** create/update of drafts is supported; **no automated signal ingestion** in this sub-phase.
-- Persistence (relational DB; H2 acceptable for local demo if clearly documented); schema migrations strategy (Flyway/Liquibase—TBD).
+- Persistence (relational DB; H2 acceptable for local demo if clearly documented); **Flyway** with a **single baseline `V1`** migration per **`phases/phase-1a-monolith-core/data-model.md`** (includes reserved-null **1b** columns on greenfield).
 - **Containerization (moved early):** **Dockerfile** for the application (multi-stage acceptable if small) and **`docker compose`** (or equivalent) that starts **app + database** with documented ports, env vars, and health checks. README: clone → `docker compose up` → hit health and incident APIs (smoke path).
 - **No** generative AI, **no** vector store, **no** MCP tools, **no** OpenTelemetry Demo dependency in default CI.
 

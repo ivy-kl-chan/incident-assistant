@@ -57,7 +57,7 @@ This document defines **definition of done (DoD)** per roadmap phase and the **t
 - [ ] **`specs/openapi/openapi-1a.yaml`** present and **aligned** with `specs/phases/phase-1a-monolith-core/api-contract.md` (paths, methods, `If-Match`/`ETag` expectations).
 - [ ] **Optimistic concurrency:** `GET /api/v1/incidents/{id}` returns **`ETag`**; **`PATCH`** and **`POST .../transitions`** require **`If-Match`** and return **`412`** when stale.
 - [ ] **`POST /api/v1/incidents`** only creates **`DRAFT`** (direct **`OPEN`** on create **forbidden**).
-- [ ] **`signals.enabled=false`:** signal ingest route returns **`404`** (or not registered)—documented.
+- [ ] **Signal ingest in 1a:** **`POST /api/v1/signal-ingest/*`** is **not registered** (no route). **`signals.enabled` / ingest `404`** behavior is **Phase 1b** (`phase-1b-signal-ingest/api-contract.md`).
 
 ### Tests
 
@@ -79,7 +79,7 @@ This document defines **definition of done (DoD)** per roadmap phase and the **t
 - [ ] **Compose story:** single merged compose **or** two compose files with explicit networking and URLs so a reviewer can reproduce Journey A on a fresh machine.
 - [ ] **No** LLM, RAG, or MCP tool code paths in production classpath for this sub-phase (or feature-flagged off entirely if stubs exist).
 - [ ] `README` updated: **how to start OTel Demo + app**, smoke checks, and resource expectations.
-- [ ] **Shipped rule:** `ruleId` **`demo.otel.signal_v1`** implemented with metadata from **`specs/phases/phase-1b-signal-ingest/rules/demo-rule-v1.yaml`** (or runtime copy with same content).
+- [ ] **Pluggable rules:** **`specs/phases/phase-1b-signal-ingest/rules/registry.yaml`** loaded at startup; at minimum **`demo.otel.signal_v1`** and **`demo.stub.always_false_v1`** implemented per registry + `api-contract.md`. **`ruleId`** not in registry → **`400`**.
 - [ ] **Dedup:** behavior matches **`specs/phases/phase-1b-signal-ingest/data-model.md`** (**Option A** default) including **`200 DUPLICATE_SIGNAL`** vs **`201`** matrix; **PostgreSQL advisory lock** (or equivalent) prevents double-create under concurrency **where DB supports it**.
 - [ ] **`specs/openapi/openapi-1b.yaml`** present and aligned with **1b** ingest + incident **extensions** (merge with `openapi-1a.yaml` for a full spec if desired).
 - [ ] **Ingest responses:** **`200 { "matched": false }`** when rule does not match; **constant-time** token compare implemented.
@@ -87,9 +87,9 @@ This document defines **definition of done (DoD)** per roadmap phase and the **t
 
 ### Tests
 
-- [ ] Unit tests for **abnormality rule** evaluation on **fixture** inputs.
+- [ ] Unit tests for **rule** evaluation on **fixture** inputs (including **unknown `ruleId`** → **`400`** and stub rule path).
 - [ ] **Signals path:** default CI uses **in-memory doubles or recorded fixtures**—no mandatory dependency on the full OTel Demo stack in the default pipeline; optional manual or nightly job documented if full-stack tests are added later.
-- [ ] Integration tests for ingest: **401**, **404** (disabled), **200** not matched, **200** dedup, **201** create, **422** bad telemetry/clock, **500** rule throw (test double), **concurrency** same-fingerprint (PostgreSQL).
+- [ ] Integration tests for ingest: **401**, **404** (disabled), **200** not matched, **200** dedup, **201** create, **400** unknown `ruleId`, **415** wrong `Content-Type`, **422** bad telemetry/clock, **500** rule throw (test double), **concurrency** same-fingerprint (PostgreSQL).
 
 ---
 

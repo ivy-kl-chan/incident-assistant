@@ -12,7 +12,7 @@
 ## Prerequisites
 
 - `../phase-1a-monolith-core/` **implementation-plan** “1a gate” passed.
-- DB can add **1b** columns/tables ( Flyway `V2` or next migration) per `data-model.md`.
+- DB uses the shared **`V1`** baseline (nullable 1b columns) per `data-model.md`; no extra versioned migration required for schema on greenfield.
 
 ## In scope (1b)
 
@@ -20,7 +20,7 @@
 |------|------|
 | Signal HTTP API + incident read **extensions** | `api-contract.md` |
 | Signal persistence, dedup, audit | `data-model.md` |
-| Demo rule | `rules/demo-rule-v1.yaml` |
+| Rule registry | `rules/registry.yaml` |
 | OpenAPI (ingest) | `../../openapi/openapi-1b.yaml` |
 | Tests | `test-plan.md` |
 | Milestones | `implementation-plan.md` |
@@ -32,7 +32,7 @@
 | Dedup **Option A** / matrix | `data-model.md` |
 | Ingest auth | `api-contract.md` |
 | `signals.enabled=false` → **404** on ingest (when 1b code present but off) | `api-contract.md` |
-| Shipped `ruleId` | `demo.otel.signal_v1` + `rules/demo-rule-v1.yaml` |
+| Pluggable `ruleId` | All ids in **`rules/registry.yaml`** (minimum **`demo.otel.signal_v1`**, **`demo.stub.always_false_v1`**); unknown id → **`400`** |
 
 ## Out of scope (1b)
 
@@ -46,7 +46,7 @@
 |------|------|
 | `api-contract.md` | Ingest + **extensions** to 1a incident list/get |
 | `data-model.md` | Additive schema + dedup |
-| `rules/demo-rule-v1.yaml` | Rule metadata + test convention |
+| `rules/registry.yaml` | Shipped rule ids + metadata + documented match semantics |
 | `test-plan.md` | 1b tests only |
 | `implementation-plan.md` | 1b milestones after 1a |
 | `review-notes.md` | 1b review notes |

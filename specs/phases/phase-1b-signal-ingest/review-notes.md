@@ -5,7 +5,7 @@
 | Dedup Option A, matrix, advisory lock | `data-model.md` |
 | Ingest token + constant-time | `api-contract.md` |
 | `200` not matched | `api-contract.md` |
-| `demo.otel.signal_v1` | `rules/demo-rule-v1.yaml` |
+| Shipped rules | `rules/registry.yaml` |
 | **No** LLM on ingest path | `ai-behavior.md` |
 
 **Split from former monolith pack** — 1a-only items in `../phase-1a-monolith-core/review-notes.md`.

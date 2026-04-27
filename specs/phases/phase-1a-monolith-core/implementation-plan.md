@@ -10,16 +10,12 @@
 
 | Step | Deliverable |
 |------|-------------|
-| M1 | Scaffold, Actuator (restricted), Flyway `V1__incidents_1a.sql` matching `data-model.md` |
+| M1 | Scaffold, Actuator (restricted), Flyway **`V1` only** — single baseline SQL per `data-model.md` (1a columns + nullable 1b columns + optional audit + indexes from 1b doc) |
 | M2 | Domain + persistence (manual incidents only) |
-| M3 | HTTP: incidents API per `api-contract.md`; **no** `POST /signal-ingest/*` (omit controller or 404) |
+| M3 | HTTP: incidents API per `api-contract.md`; **no** `POST /api/v1/signal-ingest/*` route registered (ingest **absent** in 1a) |
 | M4 | `specs/openapi/openapi-1a.yaml` complete for 1a paths; Problem Details |
 | M5 | Dockerfile + `docker-compose` app + PostgreSQL, README |
 | M6 | **1a gate:** `specs/03-acceptance-criteria.md` Phase **1a** + `test-plan.md` green |
-
-## Optional: DB forward-compat
-
-- One migration can add **nullable** 1b columns if an ADR says so; feature flags must keep **1a** API from returning **SIGNAL** or ingest paths until 1b.
 
 ## Does not start until 1a done
 
