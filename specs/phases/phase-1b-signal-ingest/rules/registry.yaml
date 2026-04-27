@@ -18,7 +18,7 @@ rules:
   - id: "demo.stub.always_false_v1"
     description: >
       Second shipped rule to prove pluggable evaluation: default implementation returns
-      matched=false for every payload (use in tests for unknown-path vs this known no-op rule).
+      matched=false for every payload. (Unknown ruleId is a separate case: not listed in this file → HTTP 400.)
     severityOnCreate: "SEV4"
     titlePrefix: "[Stub]"
     matchSemantics: >

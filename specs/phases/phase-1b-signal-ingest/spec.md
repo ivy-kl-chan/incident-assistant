@@ -7,7 +7,8 @@
 ## Purpose
 
 - **Observability-driven draft** incidents from **[OpenTelemetry Demo](https://github.com/open-telemetry/opentelemetry-demo)** (Docker), **rule-based** evaluation, **deduplication**, **telemetry pointers** on incidents.
-- **No** LLM, **no** RAG. **Ingest** is HTTP + **shared token**; CI uses **fixtures**, not full OTel in default PRs.
+- **No** LLM, **no** RAG. **Ingest** is **webhook-style**: clients **`POST`** normalized evaluations to this app over HTTP + **shared token** (see `api-contract.md`). CI uses **fixtures**, not full OTel in default PRs.
+- **Delivery order (separate backlog stories):** **metrics** path first (**1b-M**), then **traces** (**1b-T**), then **logs** (**1b-L**)—see `implementation-plan.md` and **`docs/adr/0002-phase-1b-webhook-and-incremental-telemetry.md`**.
 
 ## Prerequisites
 
@@ -21,7 +22,7 @@
 | Signal HTTP API + incident read **extensions** | `api-contract.md` |
 | Signal persistence, dedup, audit | `data-model.md` |
 | Rule registry | `rules/registry.yaml` |
-| OpenAPI (ingest) | `../../openapi/openapi-1b.yaml` |
+| OpenAPI (**1b** surfaces) | `../../openapi/openapi-1b.yaml` |
 | Tests | `test-plan.md` |
 | Milestones | `implementation-plan.md` |
 
@@ -29,15 +30,20 @@
 
 | Topic | See |
 |-------|-----|
+| Integration shape | **Webhook-style** HTTP ingest (`docs/adr/0002-…`); not poll-from-JVM as primary |
+| Incremental telemetry | **Metrics → traces → logs** stories (`implementation-plan.md`, `docs/adr/0002-…`) |
 | Dedup **Option A** / matrix | `data-model.md` |
 | Ingest auth | `api-contract.md` |
 | `signals.enabled=false` → **404** on ingest (when 1b code present but off) | `api-contract.md` |
-| Pluggable `ruleId` | All ids in **`rules/registry.yaml`** (minimum **`demo.otel.signal_v1`**, **`demo.stub.always_false_v1`**); unknown id → **`400`** |
+| Pluggable `ruleId` | All ids in **`rules/registry.yaml`** (minimum **`demo.otel.signal_v1`**, **`demo.stub.always_false_v1`**); unknown id → **`400`**; YAML **must** bind to code at startup (**fail-fast**) |
+| Ingest idempotency | Optional **`Idempotency-Key`** + store per **`api-contract.md`** / **`data-model.md`** |
+| List `source` (1b) | **Omitted** → **`MANUAL`** only; **`ALL`** returns both sources |
+| **PostgreSQL** for **1b** | Normative for CI and dedup/locks; **H2** only with documented divergence |
 
 ## Out of scope (1b)
 
 - LLM narrative on draft (**Phase 2**).
-- Outbound JVM calls to Jaeger (poll mode) — ADR if added later.
+- **Primary** integration via **poll-from-JVM** against Jaeger/Grafana (webhook **`POST`** is in scope); poll-only intake — ADR if added later.
 - mTLS for ingest in v1.
 
 ## Document index
@@ -46,7 +52,7 @@
 |------|------|
 | `api-contract.md` | Ingest + **extensions** to 1a incident list/get |
 | `data-model.md` | Additive schema + dedup |
-| `rules/registry.yaml` | Shipped rule ids + metadata + documented match semantics |
+| `rules/registry.yaml` | Shipped rule ids + metadata; **`matchSemantics`** is informative (see `api-contract.md`) |
 | `test-plan.md` | 1b tests only |
 | `implementation-plan.md` | 1b milestones after 1a |
 | `review-notes.md` | 1b review notes |

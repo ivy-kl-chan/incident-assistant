@@ -2,7 +2,7 @@
 
 **Scope:** Persists **manually created** incidents in **1a**. **Signal-backed rows** and ingest are **Phase 1b** — see `../phase-1b-signal-ingest/data-model.md` for semantics on shared columns.
 
-**Migrations (normative for this repo):** use **one** Flyway versioned script **`V1__...sql`** (single “baseline” migration) that creates the **`incidents`** table in its **final** shape for **1a+1b**: all **1a** columns plus **nullable** `created_by_rule_id`, `signal_fingerprint`, `telemetry_context`, and optional **`signal_ingest_audit`**, with indexes from **`../phase-1b-signal-ingest/data-model.md`**. **1a** application code **must not** read or write 1b-only columns or ingest until **1b** is delivered; unused columns stay **null**.
+**Migrations (normative for this repo):** use **one** Flyway versioned script **`V1__...sql`** (single “baseline” migration) that creates the **`incidents`** table in its **final** shape for **1a+1b**: all **1a** columns plus **nullable** `created_by_rule_id`, `signal_fingerprint`, `telemetry_context`, and optional **`signal_ingest_audit`** and **`signal_ingest_idempotency`** (see **`../phase-1b-signal-ingest/data-model.md`**), with indexes from that doc. **1a** application code **must not** read or write 1b-only columns or ingest until **1b** is delivered; unused columns stay **null**.
 
 ## Table: `incidents` (physical `V1` — 1a + reserved nulls)
 

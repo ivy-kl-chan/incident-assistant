@@ -27,12 +27,17 @@
 
 | Topic | Decision |
 |-------|----------|
+| Build | **Maven** (`docs/adr/0001-…`) |
 | State machine | `DRAFT` → `OPEN` → `CLOSED`; `CANCELLED` from `DRAFT` or `OPEN`; no `OPEN` from `CLOSED` in v1 |
 | Create | `POST /incidents` → **`DRAFT` only** (no `OPEN` on create) |
+| API | **REST** / JSON HTTP for this repo’s phases unless a later ADR revisits |
 | Concurrency | `ETag` + **`If-Match`** on `PATCH` and `transitions` |
-| DB | **PostgreSQL**; Testcontainers in CI; H2 local only with divergence doc |
+| DB | **PostgreSQL**; **Testcontainers from day one** for default CI integration tests; **H2** local only with divergence doc (**not** normative for **Phase 1b**—see **`../phase-1b-signal-ingest/api-contract.md`**) |
 | Docker CI | **Policy B** default (`test-plan.md`) |
-| OpenAPI | `specs/openapi/openapi-1a.yaml` **required** at 1a complete |
+| OpenAPI | `specs/openapi/openapi-1a.yaml` **required** at 1a complete (maintain with controllers) |
+| Observability (**1a**) | **Logs only**—no tracing baseline in **1a** (`docs/adr/0001-…`) |
+| End-user auth | **Out of scope** until a named later phase (`docs/adr/0001-…`) |
+| Locale | **English-only** API/UI copy for demo (`docs/adr/0001-…`) |
 
 ## Document index
 

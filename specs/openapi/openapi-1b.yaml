@@ -1,32 +1,103 @@
 openapi: 3.0.3
 info:
-  title: Incident Assistant — Phase 1b (signal ingest)
+  title: Incident Assistant — Phase 1b
   version: 1.0.0
   description: >
-    Signal ingest + incident field extensions. Normative: specs/phases/phase-1b-signal-ingest/api-contract.md
-    Prerequisite: merge with openapi-1a.yaml for a full 1a+1b view.
+    1b surface: signal ingest, extended incident reads (list + get by id).
+    Normative: specs/phases/phase-1b-signal-ingest/api-contract.md.
+    Merge with openapi-1a.yaml for create/update/transition and health (see specs/openapi/README.md).
 servers:
   - url: http://localhost:8080
 tags:
+  - name: Incidents
   - name: SignalIngest
 paths:
+  /api/v1/incidents:
+    get:
+      tags: [Incidents]
+      summary: List incidents (1b; optional source filter)
+      description: >
+        When `source` is omitted, the server returns MANUAL-only rows (same default as Phase 1a list).
+        Use `source=ALL` for MANUAL and SIGNAL rows. Feature-flag and routing semantics: phase-1b-signal-ingest/api-contract.md.
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 0, default: 0 }
+        - in: query
+          name: size
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+        - in: query
+          name: status
+          schema: { type: string }
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum: ["createdAt,asc", "createdAt,desc"]
+            default: "createdAt,desc"
+        - name: source
+          in: query
+          required: false
+          description: Optional. Omitted = MANUAL-only; MANUAL = explicit manual-only; SIGNAL = signal rows only; ALL = both.
+          schema:
+            type: string
+            enum: [MANUAL, SIGNAL, ALL]
+      responses:
+        "200":
+          description: Paged IncidentSummary (source may be SIGNAL when filter allows)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedIncidentSummaries"
+        "400": { description: Bad query (unknown keys, invalid source token, bad page/size) }
+        "503": { description: Persistence unavailable }
+  /api/v1/incidents/{id}:
+    get:
+      tags: [Incidents]
+      summary: Get incident by id (1b extended fields on signal-backed rows)
+      parameters:
+        - $ref: "#/components/parameters/IncidentId"
+      responses:
+        "200":
+          description: Incident; strong ETag (quoted decimal version) per phase-1a api-contract.md
+          headers:
+            ETag:
+              required: true
+              schema: { type: string, example: '"7"' }
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IncidentDetail1b"
+        "404": { description: Not found }
+        "503": { description: Persistence unavailable }
   /api/v1/signal-ingest/evaluations:
     post:
       tags: [SignalIngest]
       summary: Evaluate normalized signal (application/json required)
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema:
+            type: string
+            maxLength: 128
+            pattern: '^[a-zA-Z0-9._-]+$'
+          description: Optional; replay semantics per phase-1b api-contract.md
       security:
         - integrationToken: []
       requestBody:
         required: true
         content:
           application/json:
-            schema: { type: object, description: SignalEvaluationRequest per phase-1b api-contract.md }
+            schema:
+              $ref: "#/components/schemas/SignalEvaluationRequest"
       responses:
         "200": { description: Matched with dedup, not matched, or matched false }
         "201": { description: New DRAFT }
         "400": { description: Bad request or unknown ruleId }
         "401": { description: Auth }
         "404": { description: signals.enabled=false or route not mounted }
+        "409": { description: Idempotency-Key conflict (same key, different body within TTL) }
         "413": { description: Payload }
         "415": { description: Unsupported media type }
         "422": { description: Validation }
@@ -34,8 +105,89 @@ paths:
         "500": { description: Rule error }
         "503": { description: Unavailable }
 components:
+  parameters:
+    IncidentId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
   securitySchemes:
     integrationToken:
       type: apiKey
       in: header
       name: X-Integration-Token
+  schemas:
+    IncidentSummary1b:
+      type: object
+      required:
+        - id
+        - title
+        - status
+        - severity
+        - source
+        - createdAt
+        - updatedAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+        title: { type: string }
+        status:
+          type: string
+          enum: [DRAFT, OPEN, CLOSED, CANCELLED]
+        severity:
+          type: string
+          enum: [SEV1, SEV2, SEV3, SEV4]
+        source:
+          type: string
+          enum: [MANUAL, SIGNAL]
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        version: { type: integer, format: int64 }
+    IncidentDetail1b:
+      allOf:
+        - $ref: "#/components/schemas/IncidentSummary1b"
+        - type: object
+          properties:
+            description: { type: string, nullable: true }
+            transitionReason: { type: string, nullable: true }
+            telemetryContext:
+              type: object
+              nullable: true
+              additionalProperties: true
+            createdByRuleId: { type: string, nullable: true }
+            signalFingerprint:
+              type: string
+              nullable: true
+              pattern: '^[0-9a-f]{64}$'
+    PagedIncidentSummaries:
+      type: object
+      required: [items, page, size, totalElements, totalPages]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/IncidentSummary1b"
+        page: { type: integer }
+        size: { type: integer }
+        totalElements: { type: integer, format: int64 }
+        totalPages: { type: integer }
+    SignalEvaluationRequest:
+      type: object
+      required: [ruleId, observedAt, fingerprintInputs, telemetryPointers]
+      properties:
+        ruleId:
+          type: string
+          maxLength: 128
+          pattern: '^[a-z0-9._-]+$'
+        observedAt: { type: string, format: date-time }
+        fingerprintInputs:
+          type: object
+          additionalProperties: true
+        telemetryPointers:
+          type: object
+          additionalProperties: true
+        summary:
+          type: string
+          maxLength: 2000

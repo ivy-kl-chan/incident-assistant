@@ -48,8 +48,14 @@ paths:
       parameters:
         - $ref: "#/components/parameters/IncidentId"
       responses:
-        "200": { description: Incident 1a shape }
+        "200":
+          description: Incident 1a shape; includes strong ETag (quoted decimal version) per api-contract.md
+          headers:
+            ETag:
+              required: true
+              schema: { type: string, example: '"7"' }
         "404": { description: Not found }
+        "503": { description: Persistence unavailable }
     patch:
       tags: [Incidents]
       parameters:
@@ -65,12 +71,13 @@ paths:
   /api/v1/incidents/{id}/transitions:
     post:
       tags: [Incidents]
+      summary: State transition (If-Match required)
       parameters:
         - $ref: "#/components/parameters/IncidentId"
         - $ref: "#/components/parameters/IfMatch"
       responses:
         "200": { description: OK }
-        "400": { description: Invalid body }
+        "400": { description: Invalid body, unknown to value, or reason too long }
         "404": { description: Not found }
         "409": { description: Illegal transition }
         "412": { description: Stale }

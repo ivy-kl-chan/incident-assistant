@@ -16,10 +16,18 @@
 
 Applies when **`signals.enabled=true`** and DB rows may have **`source = SIGNAL`**.
 
+**Database:** **PostgreSQL** is **normative** for **1b** (advisory locks, partial indexes, optional idempotency store). **H2** (or other engines) may be used locally only with an explicit **divergence** note in README/ADR—**default CI** for **1b** ingest, dedup, and idempotency tests uses **PostgreSQL** (e.g. Testcontainers).
+
 ### `GET /api/v1/incidents` (extension)
 
-- Query **`source`**: `MANUAL` or **`SIGNAL`** (1b). Invalid combo → **400** (unchanged from enum rules).
-- `IncidentSummary`: **`source`** may be **`SIGNAL`**.
+- **Unknown query keys** and bad **`page`/`size`** → **`400`**, same as **1a** (`../phase-1a-monolith-core/api-contract.md` § Pagination).
+- Query **`source`** (optional): single token only.
+  - **Omitted** → return rows with **`source = MANUAL`** only (default; same effective filter as **1a** list).
+  - **`source=MANUAL`** → same as omitted (**`MANUAL`** only).
+  - **`source=SIGNAL`** → **`SIGNAL`** rows only.
+  - **`source=ALL`** → **`MANUAL`** and **`SIGNAL`** rows.
+  - **Unknown** token, **empty** value, **comma-separated** multiple values, or **duplicate** query keys → **`400`**.
+- `IncidentSummary`: **`source`** may be **`SIGNAL`** when filter allows it.
 
 ### `GET /api/v1/incidents/{id}` (extension)
 
@@ -41,7 +49,20 @@ Applies when **`signals.enabled=true`** and DB rows may have **`source = SIGNAL`
 
 **Auth:** header **`X-Integration-Token`** = env **`SIGNAL_INGEST_TOKEN`**; compare with **constant-time** equality.
 
-**Rule registry:** `ruleId` **must** exist in **`rules/registry.yaml`**. Unknown id → **`400`** (problem+json; treat as client error, not **`404`**).
+**Registry vs. code:** at **application startup**, every **`id`** in **`rules/registry.yaml`** **must** have a **bound evaluator** in code. If any entry lacks an evaluator, the process **must fail to start** (fail-fast). Adding a rule to YAML without code is a **deployment error**.
+
+**Rule registry:** `ruleId` on the request **must** exist in **`rules/registry.yaml`**. Unknown id → **`400`** (problem+json; not **`404`**).
+
+**Normative match behavior:** for the shipped rule ids below, the **bullet definitions** in this section are **normative**. The **`matchSemantics`** field in **`registry.yaml`** is **informative** documentation only and **must not** contradict these bullets.
+
+**Idempotency (optional header):** clients MAY send **`Idempotency-Key`** (HTTP header), max **128** chars, pattern **`^[a-zA-Z0-9._-]+$`**. When **absent**, behavior is unchanged (fingerprint dedup only, per `data-model.md`). When **present**:
+- Compute **`body_hash`** = **SHA-256** hex over **UTF-8** bytes of the **canonical JSON** of the **entire** request object (all top-level keys sorted lexicographically; recurse into nested objects the same way so byte-for-byte replays hash identically).
+- Compute **`key_hash`** = **SHA-256** hex over UTF-8 bytes of the header value.
+- **Before** rule evaluation and mutating work, look up **`key_hash`** in the idempotency store (`data-model.md`). If a row exists, is **not** expired, and **`body_hash`** **equals** the stored **`body_hash`** → return the **stored** HTTP **status** and **body** (**no** duplicate side effects).
+- If a row exists for **`key_hash`**, is **not** expired, and **`body_hash`** **≠** stored **`body_hash`** → **`409`** (problem+json; same key, different body).
+- On **successful** completion of an ingest that produced a final HTTP response (**200** / **201** with bodies defined here, including **`{ "matched": false }`**), **upsert** the row for **`key_hash`** (store **`body_hash`**, **`http_status`**, **`response_body`**, **`created_at`**).
+- Default **`INGEST_IDEMPOTENCY_TTL`**: **24 hours** (configurable). Expired rows **may** be deleted lazily.
+- **Replay:** when returning a cached response, **still require** valid **`X-Integration-Token`** and **`signals.enabled=true`**; do **not** return a cached **200**/**201** if auth fails (**401**) or ingest is disabled (**404**). Do **not** cache **401**/**404**/**409**/**5xx** responses.
 
 **Request body** (`SignalEvaluationRequest`):
 
@@ -55,7 +76,7 @@ Applies when **`signals.enabled=true`** and DB rows may have **`source = SIGNAL`
 
 **Max body: 64 KiB** → **413** / **400** as server supports.
 
-**Match semantics (per rule):** evaluation is **pluggable** by `ruleId`. Reference behavior is defined in **`rules/registry.yaml`** (`matchSemantics` per rule), summarized here:
+**Match semantics (per rule):** evaluation is **pluggable** by `ruleId`. **Normative** behavior for shipped ids is the bullet list below (see also **Normative match behavior** above re: YAML).
 
 - **`demo.otel.signal_v1`:** matches if **`fingerprintInputs.match` is boolean `true`** (CI) **or** **`fingerprintInputs.metric` equals** **`demo.synthetic`**. Else treat as not matched → **`{ "matched": false }`** without creating an incident.
 - **`demo.stub.always_false_v1`:** reference implementation **never** matches → **`{ "matched": false }`**.
@@ -70,6 +91,7 @@ Applies when **`signals.enabled=true`** and DB rows may have **`source = SIGNAL`
 | Dedup | `200` | `{ "created": false, "incidentId", "reason": "DUPLICATE_SIGNAL" }` |
 | No match | `200` | `{ "matched": false }` |
 | Unknown `ruleId` / validation | `400` / `422` | problem+json |
+| Idempotency key reuse with different body (within TTL) | `409` | problem+json |
 | Wrong `Content-Type` | `415` | problem+json optional |
 | Auth | `401` | |
 | Rate limit | `429` | if implemented |
@@ -82,7 +104,7 @@ Applies when **`signals.enabled=true`** and DB rows may have **`source = SIGNAL`
 
 ## OpenAPI (1b)
 
-- **Artifact:** `specs/openapi/openapi-1b.yaml` (ingest path + 1b field schemas where applicable). Keep aligned with 1a file or merge in tooling (see `specs/openapi/README.md`).
+- **Artifact:** `specs/openapi/openapi-1b.yaml` — at **1b** gate includes: **`GET /api/v1/incidents`** (optional **`source`**: `MANUAL` \| `SIGNAL` \| `ALL`; default **MANUAL-only** when omitted), **`GET /api/v1/incidents/{id}`** (extended **`IncidentDetail1b`** + **`ETag`**), **`POST /api/v1/signal-ingest/evaluations`** (**`Idempotency-Key`**, **`409`**, **`SignalEvaluationRequest`** schema). **Merge** with **`openapi-1a.yaml`** for **`POST/PATCH`** incidents, **`transitions`**, and **`/actuator/health`** (see `specs/openapi/README.md`).
 
 ---
 
@@ -90,6 +112,6 @@ Applies when **`signals.enabled=true`** and DB rows may have **`source = SIGNAL`
 
 | Artifact | Role |
 |----------|------|
-| `rules/registry.yaml` | **Normative** list of shipped `ruleId` values + metadata (`severityOnCreate`, `titlePrefix`, `matchSemantics`). |
+| `rules/registry.yaml` | **Normative** list of shipped **`ruleId`** values + metadata (`severityOnCreate`, `titlePrefix`). **`matchSemantics`** in YAML is **informative** only (see **Normative match behavior** in this file). |
 
-Add new shipped rules by extending **`registry.yaml`** and registering an evaluator in code (or ADR for dynamic plugins).
+Add new shipped rules by extending **`registry.yaml`** and registering an evaluator in code; **startup** **must** fail if a new YAML **`id`** is not bound (or ADR for dynamic plugins).

@@ -33,7 +33,7 @@ This document defines **definition of done (DoD)** per roadmap phase and the **t
 - [ ] `specs/02-roadmap.md` exists with ordered phases and dependencies.
 - [ ] `specs/03-acceptance-criteria.md` (this file) defines DoD and testing for each phase.
 - [ ] `README.md` explains purpose, how to read specs, and honest limitations.
-- [ ] **Human reviewer** has signed off on open questions (see README “Before Phase 1a” checklist).
+- [ ] **Human reviewer** has signed off on kickoff questions (see README **Kickoff decisions** + **`docs/adr/`**).
 
 ### Tests
 
@@ -62,8 +62,8 @@ This document defines **definition of done (DoD)** per roadmap phase and the **t
 ### Tests
 
 - [ ] Unit tests for domain validation and **draft lifecycle**.
-- [ ] Integration tests hitting real persistence (Testcontainers or equivalent **recommended**; H2-only acceptable if limitations documented).
-- [ ] API integration tests for happy path and representative error cases (**400**, **404**, **409**, **412**, **413**/**422** as specified in `specs/phases/phase-1a-monolith-core/api-contract.md`).
+- [ ] Integration tests hitting **PostgreSQL** via **Testcontainers** by default (`docs/adr/0001-kickoff-tooling-testing-and-1a-scope.md`); **H2-only** acceptable only if limitations are **explicitly** documented in README or an ADR.
+- [ ] API integration tests for happy path and representative error cases (**400**, **404**, **409**, **412**, **413**/**422**, **415**, **503** as specified in `specs/phases/phase-1a-monolith-core/api-contract.md`).
 
 ---
 
@@ -73,15 +73,18 @@ This document defines **definition of done (DoD)** per roadmap phase and the **t
 
 ### Definition of done
 
-- [ ] **[OpenTelemetry Demo](https://github.com/open-telemetry/opentelemetry-demo)** (or **approved subset**) runs via **Docker** with a **pinned** compose revision or image tags documented in README.
-- [ ] **Journey A:** Documented integration from demo signals to **draft** incident creation when **abnormality rules** match; drafts include **telemetry references** (trace id, service, time window—minimum set per ADR).
+- [ ] **[OpenTelemetry Demo](https://github.com/open-telemetry/opentelemetry-demo)** (or **approved subset**) runs via **Docker** with a **pinned** compose revision or image tags documented in README; **minimal compose profile** preferred (`docs/adr/0002-phase-1b-webhook-and-incremental-telemetry.md`).
+- [ ] **Journey A:** Documented **webhook-style** integration from demo signals to **draft** incident creation when **abnormality rules** match; drafts include **telemetry references** (expand **metrics → traces → logs** per **`phases/phase-1b-signal-ingest/implementation-plan.md`**).
 - [ ] **Dedup or cooldown** policy for repeated signals documented and implemented or explicitly deferred with issue link (avoid unbounded duplicate drafts).
 - [ ] **Compose story:** single merged compose **or** two compose files with explicit networking and URLs so a reviewer can reproduce Journey A on a fresh machine.
 - [ ] **No** LLM, RAG, or MCP tool code paths in production classpath for this sub-phase (or feature-flagged off entirely if stubs exist).
 - [ ] `README` updated: **how to start OTel Demo + app**, smoke checks, and resource expectations.
-- [ ] **Pluggable rules:** **`specs/phases/phase-1b-signal-ingest/rules/registry.yaml`** loaded at startup; at minimum **`demo.otel.signal_v1`** and **`demo.stub.always_false_v1`** implemented per registry + `api-contract.md`. **`ruleId`** not in registry → **`400`**.
-- [ ] **Dedup:** behavior matches **`specs/phases/phase-1b-signal-ingest/data-model.md`** (**Option A** default) including **`200 DUPLICATE_SIGNAL`** vs **`201`** matrix; **PostgreSQL advisory lock** (or equivalent) prevents double-create under concurrency **where DB supports it**.
-- [ ] **`specs/openapi/openapi-1b.yaml`** present and aligned with **1b** ingest + incident **extensions** (merge with `openapi-1a.yaml` for a full spec if desired).
+- [ ] **Pluggable rules:** **`specs/phases/phase-1b-signal-ingest/rules/registry.yaml`** loaded at startup; at minimum **`demo.otel.signal_v1`** and **`demo.stub.always_false_v1`** implemented per **`api-contract.md`**. **`ruleId`** not in registry → **`400`**. **Startup fail-fast** if a registry **`id`** lacks a code evaluator.
+- [ ] **Ingest idempotency:** optional **`Idempotency-Key`** per **`phase-1b-signal-ingest/api-contract.md`** (replay **200**/**201**, **409** on key conflict, **no** cache on **401**/**404**); persistence per **`data-model.md`** when enabled.
+- [ ] **`GET /api/v1/incidents` (1b):** omitted **`source`** defaults to **`MANUAL`**-only results; **`source=ALL`** documented and tested.
+- [ ] **PostgreSQL** for **1b** default CI (Testcontainers or compose); **H2** only with explicit divergence documentation if used at all.
+- [ ] **Dedup:** behavior matches **`specs/phases/phase-1b-signal-ingest/data-model.md`** (**Option A** default) including **`200 DUPLICATE_SIGNAL`** vs **`201`** matrix; **PostgreSQL advisory lock** prevents double-create under concurrency in default CI.
+- [ ] **`specs/openapi/openapi-1b.yaml`** present and aligned with **1b**: **`GET /api/v1/incidents`** (**`source`**, default MANUAL-only when omitted), **`GET /api/v1/incidents/{id}`** (extended fields + **`ETag`**), **`POST /api/v1/signal-ingest/evaluations`** (**`Idempotency-Key`**, **`409`**); merge with `openapi-1a.yaml` per `specs/openapi/README.md`.
 - [ ] **Ingest responses:** **`200 { "matched": false }`** when rule does not match; **constant-time** token compare implemented.
 - [ ] **Validation:** `observedAt` clock window, nested JSON limits, and **`ruleId`** pattern enforced per `specs/phases/phase-1b-signal-ingest/api-contract.md`.
 
@@ -89,7 +92,7 @@ This document defines **definition of done (DoD)** per roadmap phase and the **t
 
 - [ ] Unit tests for **rule** evaluation on **fixture** inputs (including **unknown `ruleId`** → **`400`** and stub rule path).
 - [ ] **Signals path:** default CI uses **in-memory doubles or recorded fixtures**—no mandatory dependency on the full OTel Demo stack in the default pipeline; optional manual or nightly job documented if full-stack tests are added later.
-- [ ] Integration tests for ingest: **401**, **404** (disabled), **200** not matched, **200** dedup, **201** create, **400** unknown `ruleId`, **415** wrong `Content-Type`, **422** bad telemetry/clock, **500** rule throw (test double), **concurrency** same-fingerprint (PostgreSQL).
+- [ ] Integration tests for ingest: **401**, **404** (disabled), **200** not matched, **200** dedup, **201** create, **400** unknown `ruleId`, **409** idempotency conflict, **415** wrong `Content-Type`, **422** bad telemetry/clock, **500** rule throw (test double), **concurrency** same-fingerprint (**PostgreSQL**), **idempotent replay** (same key + body → same outcome).
 
 ---
 

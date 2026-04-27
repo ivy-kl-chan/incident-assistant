@@ -100,6 +100,8 @@
 
 **`404`** if missing.
 
+**Availability:** if the persistence layer is unavailable, respond **`503`** (preferred) or **`500`** — same policy as list; document which.
+
 ---
 
 ## `PATCH /api/v1/incidents/{id}`
@@ -114,8 +116,9 @@
 
 - **`If-Match`** required.
 - Body: `{ "to": "OPEN" \| "CLOSED" \| "CANCELLED", "reason"?: string ≤500 }`
+- **JSON:** must be **`application/json`**; malformed JSON, **wrong `to` enum**, missing **`to`**, or **`reason`** over length → **`400`**.
 - **Transitions:** `DRAFT`→`OPEN`/`CANCELLED`; `OPEN`→`CLOSED`/`CANCELLED`; none from `CLOSED`/`CANCELLED`.
-- **Errors:** `404`, `409`, `412`.
+- **Errors:** `400`, `404`, `409`, `412`.
 
 ---
 
@@ -129,5 +132,5 @@
 
 ## OpenAPI
 
-- **Artifact:** `specs/openapi/openapi-1a.yaml` (normative for **1a**; expand schemas in M3–M4).
+- **Artifact:** `specs/openapi/openapi-1a.yaml` (normative for **1a**; expand schemas in M3–M4). **`GET /api/v1/incidents/{id}`** MUST document **`ETag`** response header and **`503`** when applicable (see `openapi-1a.yaml` vs this contract at **1a** gate).
 - **CI:** Spectral on `openapi-1a.yaml` optional, recommended.

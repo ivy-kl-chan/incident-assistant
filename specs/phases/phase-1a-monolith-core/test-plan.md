@@ -1,6 +1,6 @@
 # Test plan — Phase 1a
 
-**Principle:** Default CI: **no** OpenTelemetry stack, **no** signal ingest tests (those are **`phase-1b-signal-ingest/test-plan.md`**).
+**Principle:** Default CI: **no** OpenTelemetry stack, **no** signal ingest tests (those are **`phase-1b-signal-ingest/test-plan.md`**). **PostgreSQL via Testcontainers** is the **default** integration-test database from day one (`docs/adr/0001-kickoff-tooling-testing-and-1a-scope.md`).
 
 ## Docker / CI image
 
@@ -15,7 +15,7 @@
 
 ### Unit
 
-- State transition matrix; illegal → **409** domain / HTTP mapping.
+- State transition matrix; illegal from-state → **409**; invalid **`to`** / body → **400**.
 - Title, description, severity validation.
 - **412** on missing/wrong `If-Match` for `PATCH` and `transitions`.
 
@@ -32,8 +32,8 @@
 
 ### Error coverage
 
-- At least one test each: **400**, **404**, **409**, **412**, **413**/validation as applicable.
+- At least one test each: **400**, **404**, **409**, **412**, **413**/validation, **415** (wrong `Content-Type`), **503** (persistence unavailable where specified) as applicable per `api-contract.md`.
 
 ## Tooling
 
-- JUnit 5, AssertJ, Spring Boot Test, **Testcontainers PostgreSQL** recommended.
+- JUnit 5, AssertJ, Spring Boot Test, **Testcontainers PostgreSQL** (required for default CI integration tests unless an ADR documents an exception).

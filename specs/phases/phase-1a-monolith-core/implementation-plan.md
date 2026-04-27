@@ -4,13 +4,13 @@
 
 ## Preconditions
 
-- README “Before Phase 1a” answered where relevant (build tool, DB story).
+- Kickoff decisions recorded: **`docs/adr/0001-kickoff-tooling-testing-and-1a-scope.md`**, README **Kickoff answers**, **`docs/adr/README.md`**.
 
 ## Milestones (1a)
 
 | Step | Deliverable |
 |------|-------------|
-| M1 | Scaffold, Actuator (restricted), Flyway **`V1` only** — single baseline SQL per `data-model.md` (1a columns + nullable 1b columns + optional audit + indexes from 1b doc) |
+| M1 | **Maven** scaffold, Actuator (restricted), Flyway **`V1` only** — single baseline SQL per `data-model.md` (1a columns + nullable 1b columns + optional audit + indexes from 1b doc) |
 | M2 | Domain + persistence (manual incidents only) |
 | M3 | HTTP: incidents API per `api-contract.md`; **no** `POST /api/v1/signal-ingest/*` route registered (ingest **absent** in 1a) |
 | M4 | `specs/openapi/openapi-1a.yaml` complete for 1a paths; Problem Details |

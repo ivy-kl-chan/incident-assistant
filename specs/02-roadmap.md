@@ -22,7 +22,7 @@
 | **6** | Microservices (optional demo) | Split **one** boundary (e.g. assistant+RAG) behind HTTP with contract tests. |
 | **7** | Kubernetes (optional demo) | Manifests for **local** cluster (e.g. kind, minikube); **optional** docs/manifests to run **OpenTelemetry Demo** (or **approved subset**) on-cluster **alongside** Incident Assistant for an end-to-end telemetry + intake demo; same compose behavior **where feasible**. |
 
-Phases **6–7** are **stretch goals** for a portfolio narrative; they depend on **Phase 5** (polish) and healthy test coverage across **1a–4**.
+Phases **6–7** are **stretch goals** for a portfolio narrative; they depend on **Phase 5** (polish) and healthy test coverage across **1a–4**. Whether they are **required** portfolio outcomes is **TBD**—until decided, treat them as **optional** (`docs/adr/0001-kickoff-tooling-testing-and-1a-scope.md`).
 
 ---
 
@@ -59,9 +59,10 @@ Phases **6–7** are **stretch goals** for a portfolio narrative; they depend on
 
 **Objectives**
 
-- **Journey A — signals → draft:** Run **[OpenTelemetry Demo](https://github.com/open-telemetry/opentelemetry-demo)** in **Docker** (upstream compose or a **named minimal profile** checked into this repo or documented as a pinned revision). Incident Assistant consumes signals via **webhook, poll, or documented adapter** (per implementation plan)—**not** LLM-gated.
+- **Journey A — signals → draft:** Run **[OpenTelemetry Demo](https://github.com/open-telemetry/opentelemetry-demo)** in **Docker** using a **minimal compose profile** (or documented subset) with **pinned** revisions where possible. Incident Assistant receives signals via **webhook-style HTTP** to its ingest API (per **`phases/phase-1b-signal-ingest/`** and **`docs/adr/0002-phase-1b-webhook-and-incremental-telemetry.md`**)—**not** LLM-gated. **Delivery order:** **metrics** story first, then **traces**, then **logs** (each its own backlog slice).
 - When **abnormality rules** fire, create **`draft`** incidents carrying **telemetry pointers** (trace id, service, time window—minimum set per ADR). **Dedup or cooldown** policy documented and implemented (or explicitly deferred with issue link).
 - **Compose integration:** Either **one compose stack** (recommended for demos: shared network) or **two compose files** with explicit networking/URL documentation so a reviewer can reproduce Journey A on a fresh machine. Default **CI** continues to use **in-memory doubles or recorded fixtures**—no mandatory full OTel Demo in PR checks.
+- **Persistence for 1b intake tests:** **PostgreSQL** is the **normative** engine for dedup, advisory locks, and optional ingest idempotency (see **`phases/phase-1b-signal-ingest/api-contract.md`**); **H2** is not a substitute in default CI without an explicit divergence note.
 - **No** generative AI, **no** vector store, **no** MCP tools. Optional **LLM copy polish** on drafts belongs to **Phase 2+** and must remain non-remediating.
 
 **Dependencies:** Phase 1a complete.

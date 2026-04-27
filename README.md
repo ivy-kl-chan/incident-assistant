@@ -12,10 +12,11 @@ Incident Assistant is a portfolio and learning demo. Ivy Chan owns product direc
 
 ## What this repo contains (today)
 
-- `**specs/`** — product vision, architecture, phased roadmap, acceptance criteria, and `**specs/phases/**` per-phase detail: **1a** → `[phase-1a-monolith-core/](specs/phases/phase-1a-monolith-core/spec.md)`, **1b\*\* → `[phase-1b-signal-ingest/](specs/phases/phase-1b-signal-ingest/spec.md)` (1b after 1a).
-- `**.cursor/rules/`\*\* — Cursor project rules aligned with spec-driven delivery (optional for contributors using Cursor).
+- **`specs/`** — product vision, architecture, phased roadmap, acceptance criteria, and **`specs/phases/`** per-phase detail: **1a** → [`phase-1a-monolith-core/`](specs/phases/phase-1a-monolith-core/spec.md), **1b** → [`phase-1b-signal-ingest/`](specs/phases/phase-1b-signal-ingest/spec.md) (1b after 1a).
+- **`docs/adr/`** — architecture decision records (kickoff tooling, Phase 1b delivery shape).
+- **`.cursor/rules/`** — Cursor project rules aligned with spec-driven delivery (optional for contributors using Cursor).
 
-There is **no application code yet**; implementation starts in **Phase 1a** after specs are reviewed.
+There is **no application code yet**; **Phase 1a** scaffold may start once the team schedules work—**kickoff decisions** below and in **`docs/adr/`** are recorded.
 
 ## Quick links
 
@@ -28,7 +29,8 @@ There is **no application code yet**; implementation starts in **Phase 1a** afte
 | [specs/phases/phase-1a-monolith-core/spec.md](specs/phases/phase-1a-monolith-core/spec.md) | **Phase 1a** — manual incidents, Docker baseline (API, model, tests)              |
 | [specs/phases/phase-1b-signal-ingest/spec.md](specs/phases/phase-1b-signal-ingest/spec.md) | **Phase 1b** — signal ingest, OTel Demo (after 1a)                                |
 | [specs/openapi/openapi-1a.yaml](specs/openapi/openapi-1a.yaml)                             | OpenAPI for **1a**                                                                |
-| [specs/openapi/openapi-1b.yaml](specs/openapi/openapi-1b.yaml)                             | OpenAPI for **1b** ingest (merge with 1a after 1b)                                |
+| [specs/openapi/openapi-1b.yaml](specs/openapi/openapi-1b.yaml)                             | OpenAPI for **1b** (ingest + extended reads; merge with 1a)                        |
+| [docs/adr/README.md](docs/adr/README.md)                                                 | Architecture decision records (ADR index)                                         |
 
 ## Vision (one paragraph)
 
@@ -56,9 +58,9 @@ Details, dependencies, and risks: **[specs/02-roadmap.md](specs/02-roadmap.md)**
 - **LLMs mockable in CI**; external dependencies behind interfaces.
 - **RAG cites sources**; **tools are allowlisted and testable**.
 
-## Before Phase 1a starts (human reviewer)
+## Kickoff decisions (human reviewer — recorded 2026-04-26)
 
-Answer the open questions in the **Summary** section at the end of this README (or delegate ownership). **Phase 1a** implementation planning should not proceed until **must-decide** items have owners and decisions.
+Blocking and recommended questions from the **Summary** below are **answered**. Full prose and consequences: **[`docs/adr/0001-kickoff-tooling-testing-and-1a-scope.md`](docs/adr/0001-kickoff-tooling-testing-and-1a-scope.md)** and **[`docs/adr/0002-phase-1b-webhook-and-incremental-telemetry.md`](docs/adr/0002-phase-1b-webhook-and-incremental-telemetry.md)**.
 
 ## Contributing (after code exists)
 
@@ -86,29 +88,35 @@ _To be determined by repository owner._
 | 6     | Microservices _(stretch)_           | One extracted service + contract tests                                                                                                |
 | 7     | Kubernetes _(stretch)_              | Local-cluster manifests; **optional** OTel Demo **on-cluster** for Journey A                                                          |
 
-### Questions a human reviewer should answer before Phase 1a
+### Kickoff answers (Phase 1a / 1b)
 
-**Must decide (blocking Phase 1a kickoff)**
+**Must decide — resolved**
 
-1. **Build tool:** Maven or Gradle? (Affects repo layout and CI templates.)
-2. **Persistence for local dev vs CI:** Testcontainers from day one vs H2 for speed—with explicit tradeoff acceptance?
-3. **API style:** REST only for all phases, or allow Spring MVC vs WebFlux decision now?
-4. **Incident scope for Phase 1a vs 1b:** Minimum fields and operations for **1a** (create/get/list + **draft lifecycle**, promote/edit, **manual** only). For **1b**: which **signals** and **one** integration shape (webhook vs poll) for OTel Demo.
-5. **Documentation home:** Are `specs/` + README sufficient, or do you require ADRs in `docs/adr/` for Phase 1a decisions?
+| # | Topic | Decision |
+|---|--------|----------|
+| 1 | Build tool | **Maven** |
+| 2 | CI vs local DB | **Testcontainers (PostgreSQL) from day one** for default integration tests |
+| 3 | API style | **REST** for all phases (resource JSON HTTP) |
+| 4 | 1a vs 1b scope | **1a:** minimum fields/ops per **`specs/phases/phase-1a-monolith-core/`** (manual create/get/list + draft lifecycle). **1b:** **webhook-style** HTTP ingest to this service (not poll-from-JVM as primary); signals detailed in phase specs |
+| 5 | Docs home | **`specs/` + README + `docs/adr/`** (ADRs **0001**, **0002**) |
 
-**Should decide (strongly recommended)**
+**Should decide — resolved**
 
-1. **Demo narrative:** Single vertical story (e.g. “API outage playbook”) for later RAG corpus, or generic placeholders?
-2. **OpenTelemetry Demo scope:** Full stack vs **minimal compose profile** for local dev; which **signals** (metrics only, traces, logs) gate **draft** creation in **Phase 1b**?
-3. **OpenAPI:** Generate and publish from Phase **1a** controllers, or defer to Phase 2?
-4. **Auth:** Explicitly out of scope until a named phase, or minimal API key from Phase **1a** (especially for any **signal ingress** in **1b**)?
-5. **Observability:** Micrometer + logs only in Phase **1a**, or any tracing baseline (e.g. Micrometer tracing) from the start?
-6. **Stretch phases 6–7:** Confirm they are optional for portfolio timeline vs required outcomes.
+| # | Topic | Decision |
+|---|--------|----------|
+| 1 | Demo narrative | **Single vertical** playbook for later RAG/demo cohesion (content can grow iteratively) |
+| 2 | OTel Demo + signals | **Minimal compose profile**; Phase **1b** split into stories: **metrics first**, then **traces**, then **logs** (each own backlog story) |
+| 3 | OpenAPI | **In Phase 1** (maintain **`specs/openapi/`** with controllers) |
+| 4 | End-user auth | **Out of scope** until a named later phase (ingest **token** remains per **1b** `api-contract.md`) |
+| 5 | Observability in **1a** | **Logs only** (no Micrometer tracing baseline in **1a**) |
+| 6 | Stretch **6–7** | **TBD** vs portfolio timeline—remain **optional** until promoted |
 
-**Assumptions to validate**
+**Assumptions — validated**
 
-1. Target JDK is **21** everywhere (CI, Docker, dev)—any exception for contributors?
-2. **English-only** UI/API messages for demo is acceptable.
-3. No requirement to integrate with a real vendor (PagerDuty, Slack, Datadog) in v1—stubs/mocks only until a later optional phase; **OpenTelemetry Demo** is the intentional telemetry reference, not a production vendor SLA.
+| # | Assumption | Validated |
+|---|------------|-----------|
+| 1 | JDK **21** everywhere | **Yes** |
+| 2 | **English-only** UI/API for demo | **Yes** |
+| 3 | No real vendor SLA in v1; OTel Demo as reference | **Yes** |
 
-Once these are answered, capture decisions in short **Phase 1a** and **Phase 1b** implementation plans (per project rules: summary, affected files, plan, test plan, risks) before writing application code.
+Implementation plans under **`specs/phases/`** track execution; ADRs above are the durable record.

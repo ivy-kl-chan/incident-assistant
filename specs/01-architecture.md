@@ -2,14 +2,14 @@
 
 ## Context
 
-Incident Assistant is implemented as a **Java 21 / Spring Boot 3** application. **Phases 1a–1b** target a **modular monolith**: one deployable artifact with **internal package/module boundaries** that map to potential future services. **Phase 1a** ships core incidents and **Docker** baseline; **Phase 1b** adds **signals-ingestion** against **OpenTelemetry Demo in Docker**.
+Incident Assistant is implemented as a **Java 21 / Spring Boot 3** application (**Maven**; see **`docs/adr/0001-kickoff-tooling-testing-and-1a-scope.md`**). **Phases 1a–1b** target a **modular monolith**: one deployable artifact with **internal package/module boundaries** that map to potential future services. **Phase 1a** ships core incidents and **Docker** baseline; **Phase 1b** adds **webhook-style signals ingestion** against **OpenTelemetry Demo in Docker** (`docs/adr/0002-phase-1b-webhook-and-incremental-telemetry.md`).
 
 ## High-level architecture (conceptual)
 
 ```text
         ┌────────────────────────────────────────────────────────────┐
-        │  Signals path (Journey A) — optional HTTP / webhook / poll   │
-        │  OpenTelemetry Demo–aligned collectors or alert callbacks    │
+        │  Signals path (Journey A) — webhook-style HTTP POST to app   │
+        │  (OTel Demo–aligned adapters / collectors; see ADR 0002)     │
         └────────────────────────────┬───────────────────────────────┘
                                      │ draft incident requests
                                      ▼

@@ -15,3 +15,4 @@
 | Date | Note |
 |------|------|
 | 2026-04-26 | Split: 1a folder only |
+| 2026-04-26 | Kickoff: Maven, Testcontainers default CI, REST, logs-only **1a**, OpenAPI Phase 1 (`docs/adr/0001-…`) |
