@@ -1,5 +1,5 @@
 ---
-description: Incident Assistant — spec-driven development, AI safety, testing, and phase gates
+description: Incident Assistant — spec-driven development, story-based phases, AI safety, testing, and phase gates
 alwaysApply: true
 ---
 
@@ -13,32 +13,48 @@ This project must follow **specification-driven development**.
 
 1. Do not implement features before a spec exists.
 2. Do not modify code before producing an implementation plan.
-3. Do not expand the current phase scope without human approval.
-4. Each phase must be fully tested before the next phase starts.
-5. Prefer simple monolith design first; avoid premature microservices.
-6. Keep future microservice boundaries in mind through clean modules and interfaces.
-7. AI behavior must be safe, testable, and grounded in evidence.
-8. The assistant must separate facts, assumptions, and recommendations.
-9. RAG answers must cite sources.
-10. MCP tools must be explicit, controlled, and testable.
-11. No automatic remediation actions in early phases.
-12. All external dependencies must be abstracted behind interfaces.
-13. All LLM calls must be mockable in tests.
-14. All generated code must include meaningful unit and integration tests.
-15. Update specs and README when behavior changes.
+3. Do not start phase implementation until that phase is broken into stories (see **Story-based implementation**).
+4. Do not expand the current phase scope without human approval.
+5. Each phase must be fully tested before the next phase starts; a phase is complete only when all required stories are done and phase acceptance criteria pass.
+6. Prefer simple monolith design first; avoid premature microservices.
+7. Keep future microservice boundaries in mind through clean modules and interfaces.
+8. AI behavior must be safe, testable, and grounded in evidence.
+9. The assistant must separate facts, assumptions, and recommendations.
+10. RAG answers must cite sources.
+11. MCP tools must be explicit, controlled, and testable.
+12. No automatic remediation actions in early phases.
+13. All external dependencies must be abstracted behind interfaces.
+14. All LLM calls must be mockable in tests.
+15. All generated code must include meaningful unit and integration tests; every story implementation must include tests for that story’s scope.
+16. Update specs and README when behavior changes.
+
+## Story-based implementation (per phase)
+
+1. **Break down before coding:** Each phase must be broken into **implementation stories** before implementation on that phase begins (tracked in phase docs or a dedicated story list for the phase).
+2. **Traceability:** Each story must reference the relevant phase spec sections (file paths or headings).
+3. **Story content:** Each story must define **scope**, **acceptance criteria**, **test requirements**, and **out-of-scope** items.
+4. **One story at a time:** Cursor implements only one story at a time.
+5. **Gate the next story:** Do not start the next story until the current story is **tested and reviewed** (per project workflow).
+6. **No opportunistic scope:** Do not implement future stories ahead of the active story.
+7. **Scoped edits:** Do not modify unrelated areas unless the active story explicitly allows it.
+8. **Status:** After implementation, update that story’s status in its artifact (e.g. draft / in progress / done).
+9. **Tests:** Every story must ship tests that meet its test requirements (see core principle 15).
+10. **Phase done:** A phase is complete only when all required stories are complete **and** phase acceptance criteria pass.
 
 ## Before coding, always produce
 
+- Active story (or confirmation that story breakdown is the current task)
 - Summary of requested work
 - Affected files
-- Proposed implementation plan
+- Proposed implementation plan aligned to the **single** active story
 - Test plan
 - Risks and assumptions
 
 ## After coding, always provide
 
+- Story status update (artifact updated)
 - What changed
 - Tests added
 - Commands to run
 - Known limitations
-- Whether the phase acceptance criteria are satisfied
+- Whether the story acceptance criteria are satisfied; whether phase acceptance criteria are satisfied (if this story completes the phase)
