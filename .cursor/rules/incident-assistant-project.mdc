@@ -1,0 +1,44 @@
+---
+description: Incident Assistant — spec-driven development, AI safety, testing, and phase gates
+alwaysApply: true
+---
+
+# Incident Assistant — Project Rules
+
+You are working on **Incident Assistant**, a Java 21 / Spring Boot 3 AI demo project.
+
+This project must follow **specification-driven development**.
+
+## Core principles
+
+1. Do not implement features before a spec exists.
+2. Do not modify code before producing an implementation plan.
+3. Do not expand the current phase scope without human approval.
+4. Each phase must be fully tested before the next phase starts.
+5. Prefer simple monolith design first; avoid premature microservices.
+6. Keep future microservice boundaries in mind through clean modules and interfaces.
+7. AI behavior must be safe, testable, and grounded in evidence.
+8. The assistant must separate facts, assumptions, and recommendations.
+9. RAG answers must cite sources.
+10. MCP tools must be explicit, controlled, and testable.
+11. No automatic remediation actions in early phases.
+12. All external dependencies must be abstracted behind interfaces.
+13. All LLM calls must be mockable in tests.
+14. All generated code must include meaningful unit and integration tests.
+15. Update specs and README when behavior changes.
+
+## Before coding, always produce
+
+- Summary of requested work
+- Affected files
+- Proposed implementation plan
+- Test plan
+- Risks and assumptions
+
+## After coding, always provide
+
+- What changed
+- Tests added
+- Commands to run
+- Known limitations
+- Whether the phase acceptance criteria are satisfied

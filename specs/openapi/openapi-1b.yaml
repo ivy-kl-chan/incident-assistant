@@ -1,0 +1,35 @@
+openapi: 3.0.3
+info:
+  title: Incident Assistant — Phase 1b (signal ingest)
+  version: 1.0.0
+  description: >
+    Signal ingest + incident field extensions. Normative: specs/phases/phase-1b-signal-ingest/api-contract.md
+    Prerequisite: merge with openapi-1a.yaml for a full 1a+1b view.
+servers:
+  - url: http://localhost:8080
+tags:
+  - name: SignalIngest
+paths:
+  /api/v1/signal-ingest/evaluations:
+    post:
+      tags: [SignalIngest]
+      summary: Evaluate normalized signal
+      security:
+        - integrationToken: []
+      responses:
+        "200": { description: Matched with dedup, not matched, or matched false }
+        "201": { description: New DRAFT }
+        "400": { description: Bad request }
+        "401": { description: Auth }
+        "404": { description: signals.enabled=false or route not mounted }
+        "413": { description: Payload }
+        "422": { description: Validation }
+        "429": { description: Rate limited }
+        "500": { description: Rule error }
+        "503": { description: Unavailable }
+components:
+  securitySchemes:
+    integrationToken:
+      type: apiKey
+      in: header
+      name: X-Integration-Token

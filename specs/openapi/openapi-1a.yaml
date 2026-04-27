@@ -1,0 +1,91 @@
+openapi: 3.0.3
+info:
+  title: Incident Assistant API (Phase 1a)
+  version: 1.0.0
+  description: >
+    Incidents + health. Normative: specs/phases/phase-1a-monolith-core/api-contract.md
+servers:
+  - url: http://localhost:8080
+tags:
+  - name: Incidents
+  - name: Health
+paths:
+  /api/v1/incidents:
+    get:
+      tags: [Incidents]
+      summary: List incidents (1a; MANUAL only for source in strict 1a)
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 0, default: 0 }
+        - in: query
+          name: size
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+        - in: query
+          name: status
+          schema: { type: string }
+        - in: query
+          name: source
+          schema: { type: string, enum: [MANUAL] }
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum: ["createdAt,asc", "createdAt,desc"]
+            default: "createdAt,desc"
+      responses:
+        "200": { description: Paged IncidentSummary }
+        "400": { description: Bad query }
+    post:
+      tags: [Incidents]
+      summary: Create incident (DRAFT, MANUAL)
+      responses:
+        "201": { description: Created }
+        "400": { description: Validation }
+        "413": { description: Payload too large }
+  /api/v1/incidents/{id}:
+    get:
+      tags: [Incidents]
+      parameters:
+        - $ref: "#/components/parameters/IncidentId"
+      responses:
+        "200": { description: Incident 1a shape }
+        "404": { description: Not found }
+    patch:
+      tags: [Incidents]
+      parameters:
+        - $ref: "#/components/parameters/IncidentId"
+        - $ref: "#/components/parameters/IfMatch"
+      responses:
+        "200": { description: OK }
+        "404": { description: Not found }
+        "409": { description: Not editable }
+        "412": { description: Stale If-Match }
+  /api/v1/incidents/{id}/transitions:
+    post:
+      tags: [Incidents]
+      parameters:
+        - $ref: "#/components/parameters/IncidentId"
+        - $ref: "#/components/parameters/IfMatch"
+      responses:
+        "200": { description: OK }
+        "404": { description: Not found }
+        "409": { description: Illegal transition }
+        "412": { description: Stale }
+  /actuator/health:
+    get:
+      tags: [Health]
+      responses:
+        "200": { description: UP }
+components:
+  parameters:
+    IncidentId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    IfMatch:
+      name: If-Match
+      in: header
+      required: true
+      schema: { type: string }
