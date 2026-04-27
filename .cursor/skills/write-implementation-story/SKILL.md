@@ -129,7 +129,7 @@ Draft
 - [ ] No future story implemented
 - [ ] Tests are meaningful
 - [ ] Public API matches spec
-- [ ] README/spec updated if needed
+- [ ] README/spec updates called out in the story ship **with** implementation when the story says so (not orphaned spec-only README edits for runtime behavior)
 
 ## Completion Notes
 
@@ -159,6 +159,7 @@ Stories use a **single** `## Status` value. Allowed values and meaning:
 - **Spec References:** use real relative links or `path: heading` as in existing phase stories; add rows for `03-acceptance-criteria.md` or ADRs when relevant.
 - **Traceability:** every **In Scope** bullet should be justified by **Spec References**; acceptance criteria must be objectively verifiable.
 - **Out of Scope:** always include explicit exclusions (avoids scope creep).
+- **README and user-facing docs:** If **Acceptance Criteria** or **Files Expected to Change** lists **repository `README.md`** (or similar), treat that as part of **implementation delivery**—the same change set / PR as the application behavior—unless the story explicitly allows a **spec-only** doc edit first. Do not instruct agents to fully author normative product README sections ahead of code when the story ties those docs to shipped endpoints or commands.
 - After the file is written, give a short chat summary: dependencies, risks, and any spec gaps found.
 
 ## Relation to decompose-phase-stories

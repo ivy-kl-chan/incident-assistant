@@ -17,7 +17,7 @@
 | M5 | Dockerfile + `docker-compose` app + PostgreSQL, README |
 | M6 | **1a gate:** `specs/03-acceptance-criteria.md` Phase **1a** + `test-plan.md` green |
 
-**Story mapping:** see [`../phase-1-monolith-mvp/stories/README.md`](../phase-1-monolith-mvp/stories/README.md). Roughly **M1** → Stories **1–2**, **M2** → **3**, **M3** → **4–6**, **M4** → **7**, **M5** → **8**, **M6** → **9** (with **8** + **9** together closing container/readiness/no-ingest DoD).
+**Story mapping:** numbered `story-*.md` files under [`../phase-1-monolith-mvp/stories/`](../phase-1-monolith-mvp/stories/). Roughly **M1** → Stories **1–2**, **M2** → **3**, **M3** → **4–6**, **M4** → **7**, **M5** → **8**, **M6** → **9** (with **8** + **9** together closing container/readiness/no-ingest DoD).
 
 ## Does not start until 1a done
 
