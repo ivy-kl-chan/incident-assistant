@@ -1,4 +1,6 @@
-# Story 5 — Incidents: PATCH, ETag, and optimistic concurrency
+# Story 5: Phase 1a — Incidents: PATCH, ETag, and optimistic concurrency
+
+*Label: Optimistic concurrency*
 
 ## 1. Status
 

@@ -1,4 +1,6 @@
-# Story 1 — Application scaffold and health endpoints
+# Story 1: Phase 1a — Application scaffold and health endpoints
+
+*Label: Scaffold & Actuator*
 
 ## 1. Status
 

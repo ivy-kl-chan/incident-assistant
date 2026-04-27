@@ -1,4 +1,6 @@
-# Story 2 — Flyway V1 baseline schema (1a + reserved 1b columns)
+# Story 2: Phase 1a — Flyway V1 baseline (reserved 1b columns)
+
+*Label: Shared schema baseline*
 
 ## 1. Status
 

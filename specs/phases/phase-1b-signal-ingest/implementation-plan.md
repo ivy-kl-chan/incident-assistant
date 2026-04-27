@@ -15,6 +15,8 @@ Aligned with **`docs/adr/0002-phase-1b-webhook-and-incremental-telemetry.md`**:
 | **1b-T** | **Traces:** extend **`telemetryPointers`**, rules, and README for **trace**-centric Journey A. |
 | **1b-L** | **Logs:** extend rules/docs for **log**-driven evaluation and pointers. |
 
+**Backlog mapping (Phase 1 monolith MVP stories):** **1b-M** → [`../phase-1-monolith-mvp/stories/story-11-1b-signal-ingest-http-evaluations.md`](../phase-1-monolith-mvp/stories/story-11-1b-signal-ingest-http-evaluations.md) (+ supporting **10**, **12**, **13**, **14**, **15**). **1b-T** / **1b-L** → placeholders [`story-16-1b-traces-telemetry-placeholder.md`](../phase-1-monolith-mvp/stories/story-16-1b-traces-telemetry-placeholder.md), [`story-17-1b-logs-telemetry-placeholder.md`](../phase-1-monolith-mvp/stories/story-17-1b-logs-telemetry-placeholder.md) until promoted to active stories.
+
 **1b-M** should reach a demonstrable **201** path before **1b-T** expands scope.
 
 ## Milestones (1b)

@@ -1,4 +1,6 @@
-# Story 15 — Phase 1b demo reproduction: observability stack and Journey A
+# Story 15: Phase 1b — Demo reproduction: observability stack and Journey A
+
+*Label: OTel demo Journey A*
 
 ## 1. Status
 
@@ -27,11 +29,11 @@ Demo operators can run **end-to-end Journey A** on a fresh machine using repo do
 - Documented **minimal compose profile** (or two compose files with explicit networking and URLs) so **Journey A** is reproducible per **`03-acceptance-criteria.md`** § Phase **1b**.
 - **Pinned** image tags or compose revision reference in README (and optional `docs/` pointer) per **1b** DoD.
 - README section: **how to start** observability demo stack **+** Incident Assistant, **smoke checks**, and **resource expectations**.
-- Wire-up narrative for **metrics-first** (**1b-M**) at minimum; **traces** (**1b-T**) and **logs** (**1b-L**) documented per **`implementation-plan.md`** when those milestones are in scope for the same release (may be incremental subsections).
+- Wire-up narrative for **metrics-first** (**1b-M**) at minimum; **traces** (**1b-T**) and **logs** (**1b-L**) documented per **`implementation-plan.md`** when those milestones are in scope—**Stories 16–17** own implementation; this story’s README may stub honest “not yet proven” notes until they land.
 
 ## 6. Out of Scope
 
-- **New** rule IDs or ingest contract changes beyond Stories **9–12** (implementation already landed there).
+- **New** rule IDs or ingest contract changes beyond Stories **10–13** (implementation already landed there).
 - **LLM**, **RAG**, **MCP** narrative or tooling.
 - **Kubernetes** deployment of the demo or app (**Phase 7** optional path).
 - **Microservices** extraction or split compose ownership across repos.
@@ -43,7 +45,7 @@ None (uses **`POST /api/v1/signal-ingest/evaluations`** and read APIs from prior
 
 ## 8. Data Model Changes
 
-None (schema already from Stories **2**, **10**, **11**).
+None (schema already from Stories **2**, **11**, **12**).
 
 ## 9. Business Rules
 
@@ -55,7 +57,7 @@ None (schema already from Stories **2**, **10**, **11**).
 - [ ] **`specs/03-acceptance-criteria.md`** Phase **1b** bullets for **OpenTelemetry Demo**, **compose story**, and **README** updates are satisfied.
 - [ ] A reviewer on a **fresh machine** can follow README and observe at least one **201** draft creation from a **documented** demo-driven evaluation path (**metrics** path minimum per **1b-M**).
 - [ ] **Pinned** versions documented; **resource expectations** explicit.
-- [ ] **Pluggable rules** and **registry** behavior remain as implemented in Story **9** (no undocumented rule ids).
+- [ ] **Pluggable rules** and **registry** behavior remain as implemented in Story **10** (no undocumented rule ids).
 
 ## 11. Test Requirements
 
@@ -68,15 +70,15 @@ None (schema already from Stories **2**, **10**, **11**).
 
 ## 13. Implementation Notes
 
-- **Depends on:** Stories **9–12** (ingest + read + OpenAPI **1b**); coordinate with Story **14** so **1a** base compose and **1b** demo overlays do not conflict.
-- **Design note:** incremental telemetry (**metrics → traces → logs**) may ship across multiple releases; keep README honest about which pointers are proven in CI vs manual only.
+- **Depends on:** Stories **10–13** (ingest + read + OpenAPI **1b**); coordinate with Story **8** so **1a** base compose and **1b** demo overlays do not conflict.
+- **Design note:** incremental telemetry (**metrics → traces → logs**) may ship across multiple releases; keep README honest about which pointers are proven in CI vs manual only; link **Stories 16–17** when deferred.
 
 ## 14. Human Review Checklist
 
 - [ ] Legal/license OK for pinned demo images.
 - [ ] Machine requirements (CPU/RAM/disk) stated for the chosen profile.
-- [ ] Network ports documented; no collisions with **Story 14** defaults.
+- [ ] Network ports documented; no collisions with **Story 8** defaults.
 
 ## 15. Completion Notes
 
-*(Fill when implemented: compose revision, profile names, PR link, any deferred **1b-T**/**1b-L** items with issue links.)*
+*(Fill when implemented: compose revision, profile names, PR link, any deferred **1b-T**/**1b-L** items with issue links to Stories **16–17**.)*

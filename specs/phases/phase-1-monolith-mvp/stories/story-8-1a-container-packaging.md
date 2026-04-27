@@ -1,4 +1,6 @@
-# Story 14 — Phase 1a container packaging: image and local compose
+# Story 8: Phase 1a — Container packaging: image and local compose
+
+*Label: Docker & Compose*
 
 ## 1. Status
 
@@ -26,12 +28,12 @@ Reviewers can reproduce the **1a** stack on a clean machine using the same paths
 
 - **`Dockerfile`** (or agreed multi-stage equivalent) producing a **runnable** image for the monolith per ADR **`docs/adr/0001-kickoff-tooling-testing-and-1a-scope.md`**.
 - **`docker compose`** (or equivalent) manifest starting **app + database** with **documented** ports, environment variables, and health/readiness checks wired to **`api-contract.md`** endpoints.
-- **README** (project root): **bare-metal and container** run paths, prerequisites, and test commands—extending Story **8** docs where those paths diverge.
+- **README** (project root): **bare-metal and container** run paths, prerequisites, and test commands—coordinate with **Story 9** (bare JVM quickstart + tests) so overlapping sections stay consistent.
 - Honest documentation of **resource expectations** and **non-root** / security basics if applied (per acceptance spirit; exact posture per team ADR).
 
 ## 6. Out of Scope
 
-- **Signal ingest**, rules, **1b** OpenAPI surfaces (**Stories 9–13**).
+- **Signal ingest**, rules, **1b** OpenAPI surfaces, and **1b** follow-on (**Stories 10–17**; see [`README.md`](README.md)).
 - **Generative AI**, **RAG**, **MCP** tooling.
 - **Multi-service** extraction, **Kubernetes** manifests, production-grade **registry** push CI (optional nightly may be Phase **5** per roadmap—here only what **1a** DoD requires).
 - **OpenTelemetry Demo** and **1b** webhook walkthroughs (**Story 15**).
@@ -66,8 +68,9 @@ None (compose may **mount** or **seed** data only if spec allows; default greenf
 
 ## 13. Implementation Notes
 
-- **Depends on:** Stories **1–7** (functional **1a** API + OpenAPI **1a** baseline); may proceed in parallel with final **1a** polish in Story **8** if health/DB wiring already stable—coordinate to avoid duplicate README edits.
+- **Depends on:** Stories **1–7** (functional **1a** API + OpenAPI **1a** baseline); may proceed in parallel with final **1a** polish in Story **9** if health/DB wiring already stable—coordinate to avoid duplicate README edits.
 - Prefer **one** merged compose file for **1a** or a **base** file extended by **Story 15** for demo profiles (**ADR 0002** alignment).
+- **`specs/03-acceptance-criteria.md`** Phase **1a** DoD for image/compose is satisfied together with Story **9** (readiness, no ingest); neither story alone closes **1a**.
 
 ## 14. Human Review Checklist
 

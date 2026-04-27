@@ -1,4 +1,6 @@
-# Story 9 — Rule registry loading and pluggable evaluators
+# Story 10: Phase 1b — Rule registry loading and pluggable evaluators
+
+*Label: Rule registry*
 
 ## 1. Status
 
@@ -21,6 +23,7 @@ Signal evaluation is deterministic, testable, and extensible: unknown **`ruleId`
 | [`../../phase-1b-signal-ingest/api-contract.md`](../../phase-1b-signal-ingest/api-contract.md) | Normative match bullets; unknown id **400**; startup binding |
 | [`../../phase-1b-signal-ingest/rules/registry.yaml`](../../phase-1b-signal-ingest/rules/registry.yaml) | Shipped ids and metadata (**`matchSemantics`** informative only) |
 | [`../../phase-1b-signal-ingest/test-plan.md`](../../phase-1b-signal-ingest/test-plan.md) | Unit tests for rules + startup misconfiguration |
+| [`../../phase-1b-signal-ingest/implementation-plan.md`](../../phase-1b-signal-ingest/implementation-plan.md) | **1b-M** / **B2**; **1b-T** / **1b-L** deferred to Stories **16–17** |
 
 ## 5. In Scope
 
@@ -32,9 +35,10 @@ Signal evaluation is deterministic, testable, and extensible: unknown **`ruleId`
 
 ## 6. Out of Scope
 
-- HTTP **`POST /api/v1/signal-ingest/evaluations`** (Story **10–12**).
-- **Deduplication**, **fingerprint**, **advisory locks** (Story **11**).
+- HTTP **`POST /api/v1/signal-ingest/evaluations`** (**Stories 11–13**).
+- **Deduplication**, **fingerprint**, **advisory locks** (**Story 11**).
 - **OpenAPI 1b**.
+- **Trace-** / **log-first** evaluation expansions (**Stories 16–17**).
 - **AI**, **RAG**, **MCP**, **Docker**, **OpenTelemetry Demo**, **Kubernetes**, **microservices**.
 
 ## 7. API Changes
@@ -54,7 +58,7 @@ None.
 - [ ] Application fails to start if a YAML **`id`** lacks an evaluator binding (test with temporary broken fixture in test module, not committed production YAML).
 - [ ] **`demo.otel.signal_v1`** matches only per normative rules; otherwise evaluation yields “not matched”.
 - [ ] **`demo.stub.always_false_v1`** never matches.
-- [ ] Unknown **`ruleId`** at runtime is classified for HTTP layer as **400** (covered again in Story **10** integration tests).
+- [ ] Unknown **`ruleId`** at runtime is classified for HTTP layer as **400** (covered again in Story **11** integration tests).
 
 ## 11. Test Requirements
 

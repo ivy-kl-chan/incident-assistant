@@ -1,4 +1,6 @@
-# Story 12 — Incident read API extensions and OpenAPI 1b
+# Story 13: Phase 1b — Incident read API extensions and OpenAPI 1b
+
+*Label: Read extensions & OpenAPI 1b*
 
 ## 1. Status
 
@@ -55,7 +57,7 @@ None (read-only mapping to existing columns).
 - [ ] **Omitted** **`source`** returns only **`MANUAL`** rows even when **`SIGNAL`** rows exist in DB.
 - [ ] **`source=ALL`** returns mixed; **`source=SIGNAL`** only signal rows; **`source=MANUAL`** same as omitted.
 - [ ] Invalid **`source`** → **400**.
-- [ ] Detail **GET** shows extended fields for **`SIGNAL`** rows created in Story **10** fixtures.
+- [ ] Detail **GET** shows extended fields for **`SIGNAL`** rows created in Story **11** fixtures.
 - [ ] **`openapi-1b.yaml`** matches live behavior for listed paths and merges cleanly with **1a** OpenAPI per repo **`openapi/README.md`**.
 
 ## 11. Test Requirements
@@ -69,7 +71,7 @@ None (read-only mapping to existing columns).
 
 ## 13. Implementation Notes
 
-- Ensure **OpenAPI** documents **`Idempotency-Key`** and **ingest** schemas added in Stories **10–11** if not already mirrored.
+- Ensure **OpenAPI** documents **`Idempotency-Key`** and **ingest** schemas added in Stories **11–12** if not already mirrored.
 
 ## 14. Human Review Checklist
 

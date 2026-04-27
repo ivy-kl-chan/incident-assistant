@@ -1,4 +1,6 @@
-# Story 6 — Incident lifecycle transitions
+# Story 6: Phase 1a — Incident lifecycle transitions
+
+*Label: Lifecycle transitions*
 
 ## 1. Status
 

@@ -1,11 +1,11 @@
 ---
-name: spec-review-phase-final
+name: review-spec-phase-final
 description: >-
   Critically reviews the complete specification set for a single roadmap phase
   (final sign-off) as a backend technical lead, using the same checklist as
-  spec-review-chat-scope. Use when the user asks to review, grill, or sign off
+  review-spec-chat-scope. Use when the user asks to review, grill, or sign off
   a phase’s specs; wants a full-phase spec critique; or mentions
-  spec-review-phase-final, phase final review, or phase spec quality before
+  review-spec-phase-final, phase final review, or phase spec quality before
   implementation starts.
 ---
 
@@ -76,4 +76,4 @@ Prefer short paragraphs and bullets. Every major finding should tie to **where**
 
 ## Alignment with chat-scoped review
 
-This skill uses the **same review checklist and output structure** as `spec-review-chat-scope`; only **scope** differs (full phase directory vs chat-tied files).
+This skill uses the **same review checklist and output structure** as `review-spec-chat-scope`; only **scope** differs (full phase directory vs chat-tied files).

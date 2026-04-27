@@ -6,7 +6,7 @@ description: >-
   references, scope, API/data rules, acceptance and test checklists, files,
   review, completion). Use when the user asks to write, draft, or rewrite one
   story file; to align a story with phase specs; or when executing
-  phase-story-breakdown (every `story-*.md` produced there must follow this
+  decompose-phase-stories (every `story-*.md` produced there must follow this
   template).
 ---
 
@@ -16,7 +16,7 @@ description: >-
 
 - User wants **one** new or updated story under `specs/phases/<phase>/stories/`.
 - User asks for the **full story template** (all sections below).
-- **phase-story-breakdown** uses this template for **all** stories it creates under `stories/`; this skill also applies when drafting or rewriting **one** story in isolation.
+- **decompose-phase-stories** uses this template for **all** stories it creates under `stories/`; this skill also applies when drafting or rewriting **one** story in isolation.
 
 ## Before writing
 
@@ -26,7 +26,7 @@ description: >-
 
 ## Fifteen traceability areas
 
-The template below includes **all fifteen** planning areas used in this repo (see **phase-story-breakdown** “Fifteen traceability areas” checklist). Headings use `##` and the title uses `# Story X:` as shown—**do not omit a section**. If a section is empty, write `None.` or a single honest placeholder (e.g. “N/A—no HTTP surface in this story.”).
+The template below includes **all fifteen** planning areas used in this repo (see **decompose-phase-stories** “Fifteen traceability areas” checklist). Headings use `##` and the title uses `# Story X:` as shown—**do not omit a section**. If a section is empty, write `None.` or a single honest placeholder (e.g. “N/A—no HTTP surface in this story.”).
 
 ## Required output template (use verbatim structure)
 
@@ -122,6 +122,6 @@ Draft | Approved | In Progress | Implemented | Reviewed | Complete
 - **Out of Scope:** always include explicit exclusions (avoids scope creep).
 - After the file is written, give a short chat summary: dependencies, risks, and any spec gaps found.
 
-## Relation to phase-story-breakdown
+## Relation to decompose-phase-stories
 
-**phase-story-breakdown** owns phase inputs, story count, ordering, dependencies, and `stories/` naming; it **requires** this file’s template for every story body. Use **write-implementation-story** alone when the user only wants one story written or normalized to this template without a full phase pass.
+**decompose-phase-stories** owns phase inputs, story count, ordering, dependencies, and `stories/` naming; it **requires** this file’s template for every story body. Use **write-implementation-story** alone when the user only wants one story written or normalized to this template without a full phase pass.

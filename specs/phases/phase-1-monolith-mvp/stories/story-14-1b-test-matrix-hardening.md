@@ -1,4 +1,6 @@
-# Story 13 — Phase 1b automated test matrix completion
+# Story 14: Phase 1b — Automated test matrix completion
+
+*Label: Test matrix (1b gate)*
 
 ## 1. Status
 
@@ -6,7 +8,7 @@ Planned
 
 ## 2. Goal
 
-Close remaining **1b** `test-plan.md` items not explicitly gated by Stories **10–12**: rule internal **500**, validation **422** paths (clock / nested limits), unknown **`ruleId`** integration coverage cross-check, and documented **429** rate limiting stance (**implemented** vs **not implemented**).
+Close remaining **1b** `test-plan.md` items not explicitly gated by Stories **11–13**: rule internal **500**, validation **422** paths (clock / nested limits), unknown **`ruleId`** integration coverage cross-check, and documented **429** rate limiting stance (**implemented** vs **not implemented**).
 
 ## 3. User Value
 
@@ -26,7 +28,7 @@ Ingest and read paths behave predictably under failure and strict validation—r
 - Automated tests proving **500** path when a rule evaluator throws (test double / stub implementation).
 - Automated tests for **422** (or **400** where contract allows) on **`observedAt`** window violations and oversized/too-deep **`fingerprintInputs`** / **`telemetryPointers`** per **`api-contract.md`**.
 - Document **429**: if not implemented, state “not implemented” in README/OpenAPI; if implemented, add tests per **`test-plan.md`**.
-- Audit Stories **10–12** for any **test-plan.md** row still missing and add targeted tests.
+- Audit Stories **11–13** for any **test-plan.md** row still missing and add targeted tests.
 
 ## 6. Out of Scope
 

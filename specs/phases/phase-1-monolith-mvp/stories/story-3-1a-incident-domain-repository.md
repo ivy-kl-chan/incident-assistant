@@ -1,4 +1,6 @@
-# Story 3 — Incident domain and manual persistence
+# Story 3: Phase 1a — Incident domain and manual persistence
+
+*Label: Domain & persistence*
 
 ## 1. Status
 

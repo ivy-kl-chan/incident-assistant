@@ -1,4 +1,6 @@
-# Story 7 — RFC 7807 Problem Details and OpenAPI 1a alignment
+# Story 7: Phase 1a — RFC 7807 Problem Details and OpenAPI 1a alignment
+
+*Label: Errors & OpenAPI 1a*
 
 ## 1. Status
 
@@ -6,7 +8,7 @@ Planned
 
 ## 2. Goal
 
-Standardize error responses as **RFC 7807** **`application/problem+json`** across **1a** incident endpoints and bring **`specs/openapi/openapi-1a.yaml`** into alignment with implemented behavior and **`phase-1a-monolith-core/api-contract.md`**.
+Standardize error responses as **RFC 7807** **`application/problem+json`** across **1a** incident endpoints and bring **`specs/openapi/openapi-1a.yaml`** into alignment with implemented behavior and **`phase-1a-monolith-core/api-contract.md`.
 
 ## 3. User Value
 
@@ -64,7 +66,7 @@ None.
 
 ## 13. Implementation Notes
 
-- List endpoint must remain documented without **`source`** query (**1b** adds it in **1b** OpenAPI).
+- List endpoint must remain documented without **`source`** query (**1b** adds it in **1b** OpenAPI; Story **13**).
 
 ## 14. Human Review Checklist
 

@@ -1,4 +1,6 @@
-# Story 11 — Ingest idempotency key, replay, and optional audit
+# Story 12: Phase 1b — Ingest idempotency key, replay, and optional audit
+
+*Label: Idempotency & audit*
 
 ## 1. Status
 
@@ -33,8 +35,8 @@ Safe retries from webhook clients do not create duplicate incidents; operators c
 
 ## 6. Out of Scope
 
-- Changing **dedup** matrix (**Story 10**).
-- **`GET`** incident extensions (**Story 12**).
+- Changing **dedup** matrix (**Story 11**).
+- **`GET`** incident extensions (**Story 13**).
 - **Rate limiting** (**429**) unless team pulls it in here—default **out** unless spec mandates “if implemented”.
 - **Docker**, **OpenTelemetry Demo**, **Kubernetes**, **microservices**, **AI**, **RAG**, **MCP**.
 

@@ -1,4 +1,6 @@
-# Story 8 — Phase 1a integration gate: readiness, docs, no ingest route
+# Story 9: Phase 1a — Integration gate: readiness, docs, no ingest route
+
+*Label: 1a exit criteria*
 
 ## 1. Status
 
@@ -32,9 +34,9 @@ Operators can trust readiness probes once the DB is wired; contributors have a c
 
 ## 6. Out of Scope
 
-- **Container image** and **compose** deliverables required by **`03-acceptance-criteria.md`** Phase **1a** — covered by **Story 14** (`story-14-1a-container-packaging.md`).
+- **Container image** and **compose** deliverables required by **`03-acceptance-criteria.md`** Phase **1a** — covered by **Story 8** (`story-8-1a-container-packaging.md`).
 - **OpenTelemetry Demo** reproduction and **Journey A** end-to-end walkthrough — **Story 15** (`story-15-1b-otel-demo-journey-a.md`).
-- **1b** ingest implementation (**Stories 9–13**).
+- **1b** implementation and demo stack (**Stories 10–17**; see [`README.md`](README.md)).
 - **AI**, **RAG**, **MCP**, **Kubernetes**, **microservices** product scope.
 
 ## 7. API Changes
@@ -66,11 +68,12 @@ None.
 
 ## 13. Implementation Notes
 
-- **Story 14** closes the **1a** container/image/compose items in **`03-acceptance-criteria.md`**; this story (**8**) remains the **integration gate** for readiness semantics, **no ingest route**, and **test-plan** green for **1a** APIs.
+- **Story 8** closes the **1a** container/image/compose items in **`03-acceptance-criteria.md`**; **this story (9)** remains the **integration gate** for readiness semantics, **no ingest route**, and **test-plan** green for **1a** APIs.
+- **`specs/03-acceptance-criteria.md`** Phase **1a** DoD requires **Stories 1–9** together (**Story 8** + **Story 9** jointly satisfy image/compose/readiness/no-ingest expectations).
 
 ## 14. Human Review Checklist
 
-- [ ] **1a** DoD items covered by Stories **1–8** plus **Story 14** are checked off in release notes.
+- [ ] **1a** DoD items covered by **Stories 1–9** are checked off in release notes.
 - [ ] Readiness semantics match **`api-contract.md`** when DB is up/down.
 
 ## 15. Completion Notes

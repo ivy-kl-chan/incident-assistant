@@ -1,4 +1,6 @@
-# Story 4 — Incidents: create, read by id, list with pagination
+# Story 4: Phase 1a — Incidents: create, read by id, list with pagination
+
+*Label: Incidents HTTP (create/list/get)*
 
 ## 1. Status
 
@@ -33,7 +35,7 @@ Users can create draft incidents, open a single incident, and browse a paginated
 
 - **`PATCH`**, **`POST .../transitions`**, **`If-Match` / `ETag`** (Story 5–6).
 - RFC 7807 **Problem Details** for all error paths (Story 7; may return minimal errors until then if team sequences Story 7 first—prefer completing Problem Details before calling Story 4 “done” for external reviewers).
-- **`source`** query parameter (**1b** extension).
+- **`source`** query parameter (**1b** extension; see Story **13**).
 - **Signal ingest** routes.
 - **AI**, **RAG**, **MCP**, **Docker**, **Kubernetes**, **microservices**.
 

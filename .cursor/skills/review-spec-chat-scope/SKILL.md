@@ -1,10 +1,10 @@
 ---
-name: spec-review-chat-scope
+name: review-spec-chat-scope
 description: >-
   Critically reviews specification documents as a backend technical lead, scoped
   to files or sections tied to the current chat. Use when the user asks to
   review, grill, or sign off specs; wants a spec critique limited to recent
-  changes; or mentions spec-review-chat-scope, acceptance criteria, or spec
+  changes; or mentions review-spec-chat-scope, acceptance criteria, or spec
   quality for work discussed in the conversation.
 ---
 

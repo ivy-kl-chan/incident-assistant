@@ -28,6 +28,10 @@ This project must follow **specification-driven development**.
 15. All generated code must include meaningful unit and integration tests; every story implementation must include tests for that story’s scope.
 16. Update specs and README when behavior changes.
 
+## Cursor project skills (`.cursor/skills/`)
+
+- **Naming:** Each skill’s directory name and YAML `name` field use **action-first** kebab-case: a **verb** (or clear verb phrase) comes first, then the object or scope (e.g. `review-spec-chat-scope`, `write-implementation-story`, `decompose-phase-stories`). Do not introduce new skills that put the object before the verb (e.g. avoid `spec-review-…`, `phase-…-breakdown`).
+
 ## Story-based implementation (per phase)
 
 1. **Break down before coding:** Each phase must be broken into **implementation stories** before implementation on that phase begins (tracked in phase docs or a dedicated story list for the phase).

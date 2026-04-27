@@ -1,5 +1,5 @@
 ---
-name: phase-story-breakdown
+name: decompose-phase-stories
 description: >-
   Breaks an approved roadmap phase into small, independently reviewable
   implementation story markdown files under specs/phases/<phase>/stories/,

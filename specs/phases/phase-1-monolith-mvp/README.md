@@ -9,4 +9,6 @@ Detailed specifications were **split** so **1a** and **1b** requirements are not
 
 **Implement 1a first**, then 1b.
 
+Implementation stories (numbered in **implementation order**): [`stories/README.md`](stories/README.md).
+
 The previous combined files in this folder were removed to avoid duplicate sources of truth.
