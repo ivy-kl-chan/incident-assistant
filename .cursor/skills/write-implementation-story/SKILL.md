@@ -26,18 +26,40 @@ description: >-
 
 ## Fifteen traceability areas
 
-The template below includes **all fifteen** planning areas used in this repo (see **decompose-phase-stories** “Fifteen traceability areas” checklist). Headings use `##` and the title uses `# Story X:` as shown—**do not omit a section**. If a section is empty, write `None.` or a single honest placeholder (e.g. “N/A—no HTTP surface in this story.”).
+Stories use **fifteen** `##` sections in a fixed order. **decompose-phase-stories**, **review-phase-story-breakdown**, and **review-story-pre-implementation** all expect this same set—**do not omit a section** or rename headings. If a section is empty, write `None.` or a single honest placeholder (e.g. “N/A—no HTTP surface in this story.”).
+
+## Canonical section headings (all `story-*.md` files)
+
+The story **title** is one line: `# Story <n>: [Story Name]`. After that, these headings must appear **in this order**, with **exact** titles (spelling and spacing):
+
+1. `## Status`
+2. `## Goal`
+3. `## User Value`
+4. `## Spec References`
+5. `## In Scope`
+6. `## Out of Scope`
+7. `## API Changes`
+8. `## Data Model Changes`
+9. `## Business Rules`
+10. `## Acceptance Criteria`
+11. `## Test Requirements`
+12. `## Files Expected to Change`
+13. `## Implementation Notes`
+14. `## Human Review Checklist`
+15. `## Completion Notes`
+
+The **Required output template** block below is the expanded form of this list (same headings and order).
 
 ## Required output template (use verbatim structure)
 
-Replace bracketed placeholders with real content. Keep **all headings** and the **Status** / **Acceptance Criteria** / **Test Requirements** / **Human Review Checklist** option lines as written.
+Replace bracketed placeholders with real content. Keep **all headings** and the **Acceptance Criteria** / **Test Requirements** / **Human Review Checklist** structure as written. For **`## Status`**, substitute **one** value from **Status lifecycle** (the template example uses **`Draft`** for new stories).
 
 ```markdown
 # Story X: [Story Name]
 
 ## Status
 
-Draft | Approved | In Progress | Implemented | Reviewed | Complete
+Draft
 
 ## Goal
 
@@ -114,9 +136,26 @@ Draft | Approved | In Progress | Implemented | Reviewed | Complete
 [Filled after implementation.]
 ```
 
+## Status lifecycle
+
+Stories use a **single** `## Status` value. Allowed values and meaning:
+
+| Status | When to use |
+|--------|----------------|
+| **Draft** | Story text is in progress or not yet approved for implementation. |
+| **Approved** | Pre-implementation review passed (e.g. **review-story-pre-implementation**); safe to start coding as the **active** story. |
+| **In Progress** | Implementation underway. |
+| **Implemented** | Code changes merged or otherwise delivered for this story’s scope. |
+| **Reviewed** | Human or peer review of the implementation completed. |
+| **Complete** | Story scope and acceptance criteria verified; artifact closed. |
+
+**Deprecated / avoid:** **`Planned`** — do not use for new stories; use **`Draft`** until detail exists, then **`Approved`** after gate review. Existing files with **`Planned`** should be migrated to **`Draft`** or **`Approved`** as appropriate.
+
+**Pre-implementation gate:** **`review-story-pre-implementation`** expects **`Approved`** (or an explicit human waiver if the story remains **`Draft`**).
+
 ## Rules
 
-- **Status:** set a single state (e.g. `Draft` for new files); do not leave the pipe-separated list as the literal value unless the user asked for a reminder line—normally pick one status.
+- **Status:** set exactly **one** value from the table above; never leave the template’s pipe-separated reminder as the literal file content unless the user explicitly wants a placeholder line.
 - **Spec References:** use real relative links or `path: heading` as in existing phase stories; add rows for `03-acceptance-criteria.md` or ADRs when relevant.
 - **Traceability:** every **In Scope** bullet should be justified by **Spec References**; acceptance criteria must be objectively verifiable.
 - **Out of Scope:** always include explicit exclusions (avoids scope creep).
@@ -124,4 +163,4 @@ Draft | Approved | In Progress | Implemented | Reviewed | Complete
 
 ## Relation to decompose-phase-stories
 
-**decompose-phase-stories** owns phase inputs, story count, ordering, dependencies, and `stories/` naming; it **requires** this file’s template for every story body. Use **write-implementation-story** alone when the user only wants one story written or normalized to this template without a full phase pass.
+**decompose-phase-stories** owns phase inputs, story count, ordering, dependencies, and `stories/` naming; it **requires** this file’s template and **Canonical section headings** for every story body. Use **write-implementation-story** alone when the user only wants one story written or normalized to this template without a full phase pass.

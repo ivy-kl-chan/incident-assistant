@@ -18,7 +18,7 @@ description: >-
 
 ## Story file format (mandatory)
 
-Before writing any `story-*.md` file, **read and follow** [write-implementation-story/SKILL.md](../write-implementation-story/SKILL.md). Phase breakdown **uses** that skill’s verbatim template: title `# Story <n>: …`, `##` section headings, Status lifecycle, Spec References bullets, checkbox blocks for Acceptance Criteria, Test Requirements, and Human Review Checklist, plus Goal through Completion Notes. **Do not** use alternate layouts (e.g. numbered `## 1. Status` headings) for new or rewritten stories.
+Before writing any `story-*.md` file, **read and follow** [write-implementation-story/SKILL.md](../write-implementation-story/SKILL.md). Phase breakdown **uses** that skill’s verbatim template: title `# Story <n>: …`, then the **fifteen** `##` headings in **write-implementation-story → Canonical section headings** (same order, exact titles), Status lifecycle, Spec References bullets, and the checkbox blocks under **Acceptance Criteria**, **Test Requirements**, and **Human Review Checklist**. **Do not** use alternate layouts (e.g. numbered `## 1. Status` headings) for new or rewritten stories.
 
 ## Inputs (read in order)
 
@@ -34,23 +34,23 @@ Before writing any `story-*.md` file, **read and follow** [write-implementation-
 
 ## Fifteen traceability areas (content checklist)
 
-Each story must still cover these **15** areas in the **write-implementation-story** template order (same headings as that skill—no omissions):
+Each story must include **every** heading in **write-implementation-story → Canonical section headings**, in order, with no omissions. For each section, fill as follows:
 
-1. Status — one value from the lifecycle in write-implementation-story (e.g. `Draft` for new files).
-2. Goal — one concrete outcome for this story alone.
-3. User Value — who benefits and how (operators, reviewers, integrators).
-4. Spec References — bullets for `spec.md`, `api-contract.md`, `data-model.md`, `test-plan.md` as applicable; add `03-acceptance-criteria.md`, OpenAPI, ADRs when relevant.
-5. In Scope — deliverables for **this** story only.
-6. Out of Scope — explicit exclusions (next story / future phase).
-7. API Changes — routes, headers, status codes; **None** if not applicable.
-8. Data Model Changes — entities, migrations, constraints; **None** if not applicable.
-9. Business Rules — state, auth, validation, concurrency this story touches.
-10. Acceptance Criteria — checkboxes; objectively verifiable.
-11. Test Requirements — use that skill’s checkbox lines; tie substance to `test-plan.md` where it applies.
-12. Files Expected to Change — globs or concrete paths.
-13. Implementation Notes — ordering, dependencies, edge cases; **no code blocks** unless illustrating a contract snippet already in specs.
-14. Human Review Checklist — that skill’s checkbox block.
-15. Completion Notes — placeholder until implemented.
+1. **## Status** — one value from the lifecycle in write-implementation-story (e.g. `Draft` for new files).
+2. **## Goal** — one concrete outcome for this story alone.
+3. **## User Value** — who benefits and how (operators, reviewers, integrators).
+4. **## Spec References** — bullets for `spec.md`, `api-contract.md`, `data-model.md`, `test-plan.md` as applicable; add `03-acceptance-criteria.md`, OpenAPI, ADRs when relevant.
+5. **## In Scope** — deliverables for **this** story only.
+6. **## Out of Scope** — explicit exclusions (next story / future phase).
+7. **## API Changes** — routes, headers, status codes; **None** if not applicable.
+8. **## Data Model Changes** — entities, migrations, constraints; **None** if not applicable.
+9. **## Business Rules** — state, auth, validation, concurrency this story touches.
+10. **## Acceptance Criteria** — checkboxes; objectively verifiable.
+11. **## Test Requirements** — use write-implementation-story’s checkbox lines; tie substance to `test-plan.md` where it applies.
+12. **## Files Expected to Change** — globs or concrete paths.
+13. **## Implementation Notes** — ordering, dependencies, edge cases; **no code blocks** unless illustrating a contract snippet already in specs.
+14. **## Human Review Checklist** — that skill’s checkbox block verbatim.
+15. **## Completion Notes** — placeholder until implemented.
 
 ## Rules
 

@@ -4,7 +4,7 @@
 
 ## 1. Status
 
-Planned
+Approved
 
 ## 2. Goal
 
@@ -19,21 +19,23 @@ Reviewers and developers can build and run the application shell, verify process
 | Document | Relevance |
 |----------|-----------|
 | [`../README.md`](../README.md) | Phase 1 split: **1a** then **1b**; authoritative detail under linked phase folders |
+| [`../../../../README.md`](../../../../README.md) | **Normative** actuator restriction (**health** + **readiness** only) per **`phase-1a-monolith-core/api-contract.md`**; local run prerequisites once the app exists |
 | [`../../phase-1a-monolith-core/spec.md`](../../phase-1a-monolith-core/spec.md) | Spring Boot 3 / Java 21 monolith; logs-only observability in 1a |
-| [`../../phase-1a-monolith-core/api-contract.md`](../../phase-1a-monolith-core/api-contract.md) | Actuator: `GET /actuator/health`, `GET /actuator/health/readiness` (readiness wired when DB exists) |
-| [`../../phase-1a-monolith-core/implementation-plan.md`](../../phase-1a-monolith-core/implementation-plan.md) | M1 scaffold + Actuator (restricted) |
+| [`../../phase-1a-monolith-core/api-contract.md`](../../phase-1a-monolith-core/api-contract.md) | Actuator: `GET /actuator/health`, `GET /actuator/health/readiness` (readiness reflects DB when wired); **restrict** exposure **per README** |
+| [`../../phase-1a-monolith-core/implementation-plan.md`](../../phase-1a-monolith-core/implementation-plan.md) | M1: scaffold + Actuator here; **Flyway `V1`** in **[`story-2-1a-flyway-baseline-schema.md`](story-2-1a-flyway-baseline-schema.md)** (see **Implementation Notes**) |
 | [`../../../03-acceptance-criteria.md`](../../../03-acceptance-criteria.md) | Phase 1a: builds and runs locally; health documented |
+| [`../../../../docs/adr/0001-kickoff-tooling-testing-and-1a-scope.md`](../../../../docs/adr/0001-kickoff-tooling-testing-and-1a-scope.md) | Maven; Testcontainers spirit for later stories |
 
 ## 5. In Scope
 
 - Maven project layout for the monolith application.
 - Spring Boot application entrypoint and minimal configuration.
-- Actuator endpoints **`/actuator/health`** (liveness) and **`/actuator/health/readiness`** per **1a** contract; restrict exposure to **health** and **readiness** only (align with product README guidance).
+- Actuator endpoints **`/actuator/health`** (liveness) and **`/actuator/health/readiness`** per **1a** `api-contract.md`; **restrict** HTTP exposure to **health** and **readiness** only, documented in **repository root `README.md`** (satisfies contract’s **per README** requirement).
 - Documented local run prerequisites (JDK version, Maven) for **bare JVM** execution.
 
 ## 6. Out of Scope
 
-- Incident REST APIs, Flyway, domain entities, OpenAPI YAML (later stories).
+- Incident REST APIs, **Flyway** / DB migrations (**[`story-2-1a-flyway-baseline-schema.md`](story-2-1a-flyway-baseline-schema.md)**), domain entities, OpenAPI YAML (later stories).
 - **Signal ingest** routes or `signals.enabled` behavior (**1b**).
 - Generative **AI**, **RAG**, **MCP** tooling.
 - **Docker**, **docker compose**, image build, **Kubernetes**, **microservices** split.
@@ -58,21 +60,23 @@ None.
 - [ ] Application starts locally; **`GET /actuator/health`** returns success when the process is up.
 - [ ] **`GET /actuator/health/readiness`** exists and behavior is **documented** (including any interim state before DB wiring).
 - [ ] Actuator exposure matches **restricted** contract (health + readiness only).
+- [ ] **Root `README.md`** documents **prerequisites** (JDK 21, Maven), **bare JVM** run commands once applicable, **`GET /actuator/health`** / **`GET /actuator/health/readiness`**, **restricted** actuator exposure (health + readiness only), and **interim readiness** semantics before PostgreSQL is configured (**Story 2+**).
 - [ ] No `/api/v1/signal-ingest/*` and no incident APIs required for this story’s gate.
 
 ## 11. Test Requirements
 
-- Smoke or integration test that loads the Spring context and calls **`/actuator/health`** (and readiness if applicable).
+- Integration-style test (`@SpringBootTest` or equivalent) that loads the Spring context and asserts **`GET /actuator/health`** and **`GET /actuator/health/readiness`** respond successfully for this story’s configuration (interim readiness semantics as documented in README).
 - Per **1a** `test-plan.md` spirit: no OpenTelemetry stack in default CI.
 
 ## 12. Files Expected to Change
 
-- Root / module **`pom.xml`** (or parent POM), application **`src/main/java/**`** entrypoint, **`src/main/resources/application*.yml`**, test sources under **`src/test/java/**`**, and **README** snippets for local run if acceptance criteria require it.
+- Root / module **`pom.xml`** (or parent POM), application **`src/main/java/**`** entrypoint, **`src/main/resources/application*.yml`**, test sources under **`src/test/java/**`**, and **repository root `README.md`** (prerequisites, run commands, health/readiness + actuator policy).
 
 ## 13. Implementation Notes
 
 - Prefer a single module layout consistent with **`docs/adr/0001-kickoff-tooling-testing-and-1a-scope.md`** (Maven).
-- Defer readiness strictness until PostgreSQL + Flyway exist if that avoids misleading “UP” while DB is down; document the choice.
+- **`phase-1a-monolith-core/implementation-plan.md`** M1 lists Flyway alongside scaffold; this repo **splits M1**: **Story 1** = shell + Actuator only; **Flyway `V1`** is entirely **[`story-2-1a-flyway-baseline-schema.md`](story-2-1a-flyway-baseline-schema.md)**—do not add Flyway here.
+- Defer readiness strictness until PostgreSQL + Flyway exist if that avoids misleading “UP” while DB is down; document the choice in **`README.md`**.
 
 ## 14. Human Review Checklist
 

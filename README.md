@@ -16,7 +16,24 @@ Incident Assistant is a portfolio and learning demo. Ivy Chan owns product direc
 - **`docs/adr/`** — architecture decision records (kickoff tooling, Phase 1b delivery shape).
 - **`.cursor/rules/`** — Cursor project rules aligned with spec-driven delivery (optional for contributors using Cursor).
 
-There is **no application code yet**; **Phase 1a** scaffold may start once the team schedules work—**kickoff decisions** below and in **`docs/adr/`** are recorded.
+There is **no application code yet**; **Phase 1a** scaffold may start once the team schedules work—**kickoff decisions** below and in **`docs/adr/`** are recorded. Implementation order: [`specs/phases/phase-1-monolith-mvp/stories/README.md`](specs/phases/phase-1-monolith-mvp/stories/README.md).
+
+## Application health and Actuator (Phase 1a)
+
+This section is **normative** for the Spring Boot application and satisfies **`specs/phases/phase-1a-monolith-core/api-contract.md`** (Actuator: *restrict exposure … per README*).
+
+**Endpoints (non-versioned):**
+
+- **`GET /actuator/health`** — liveness (process is running).
+- **`GET /actuator/health/readiness`** — readiness for orchestration probes.
+
+**HTTP exposure:** Only **health** and **readiness** are exposed. Other Actuator web endpoints (for example **`/actuator/env`**, **`/actuator/metrics`**) stay **disabled** for this baseline unless an ADR changes that posture.
+
+**Before PostgreSQL is configured:** Readiness does **not** yet prove the database is reachable. Document honest **interim** semantics in release notes or PR text when landing **Story 1**; full DB-backed readiness aligns with **Phase 1a** persistence stories (**Flyway** in [`story-2-1a-flyway-baseline-schema.md`](specs/phases/phase-1-monolith-mvp/stories/story-2-1a-flyway-baseline-schema.md), then datasource/repository work).
+
+**Bare JVM prerequisites:** **JDK 21**, **Maven** (project may add **`mvnw`** with Story 1).
+
+**Run and test commands:** Listed under [Contributing (after code exists)](#contributing-after-code-exists) once **Story 1** (*Application scaffold and health endpoints*) is implemented.
 
 ## Quick links
 
@@ -64,7 +81,7 @@ Blocking and recommended questions from the **Summary** below are **answered**. 
 
 ## Contributing (after code exists)
 
-Commands for build and test will be added in **Phase 1a** when the project is scaffolded. Until then, contributions are **spec-only** unless explicitly agreed.
+Commands for build and test will be added here when **Story 1** (*Application scaffold and health endpoints*, [`specs/phases/phase-1-monolith-mvp/stories/story-1-1a-app-scaffold-actuator.md`](specs/phases/phase-1-monolith-mvp/stories/story-1-1a-app-scaffold-actuator.md)) lands—typically **`mvn verify`** / **`./mvnw verify`** and **`mvn spring-boot:run`** / **`./mvnw spring-boot:run`** from the module root. Until then, contributions are **spec-only** unless explicitly agreed.
 
 ## License
 
