@@ -94,7 +94,7 @@
 | Field | Type | Notes (1a) |
 |-------|------|------------|
 | `description` | string \| null | |
-| `transitionReason` | string \| null | optional, last transition |
+| `transitionReason` | string \| null | optional, last transition; **1a**: not stored on `incidents` — **always `null`** until a later schema/API decision adds persistence |
 
 **No** `telemetryContext`, `createdByRuleId`, or `signalFingerprint` in **1a** (they appear in 1b extension doc).
 
