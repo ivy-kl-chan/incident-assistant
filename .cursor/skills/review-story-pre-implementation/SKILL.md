@@ -43,7 +43,7 @@ description: >-
 ## Workflow
 
 1. Confirm **story file path** and **phase id**; list all spec files and sections read.
-2. Verify the story matches **write-implementation-story**: all **fifteen** sections in **Canonical section headings** are present **in order** with exact `##` titles; **Status** appropriate for pre-implementation (e.g. expect `Approved` or explicit user waiver if still `Draft`).
+2. Verify the story matches **write-implementation-story**: all **fifteen** sections in **Canonical section headings** are present **in order** with exact titles **`## 1. Status`** through **`## 15. Completion Notes`**; **Status** (section 1 body) appropriate for pre-implementation (e.g. expect `Approved` or explicit user waiver if still `Draft` or `Planned`).
 3. **Traceability pass**: each **In Scope** bullet should map to **Spec References**; each **Acceptance Criteria** item should be objectively verifiable; **Out of Scope** should deflect known adjacent work.
 4. **Principal-engineer pass** (single story): apply the **nine lenses** below; flag blockers vs nice-to-haves.
 5. Produce **required output** in order. End with **go / no-go** and **questions for human approval**.
@@ -64,7 +64,7 @@ Answer each for **this story only**. If not applicable: one line, “N/A — [re
 
 ## Alignment with authoring skills
 
-- Story body is expected to follow **write-implementation-story** (fifteen **Canonical section headings** in order, plus checklist blocks from the template).
+- Story body is expected to follow **write-implementation-story** (fifteen numbered **Canonical section headings** `## 1.` … `## 15.` in order, plus checklist blocks from the template).
 - If findings imply **splitting** or **renumbering** the whole phase backlog, call that out and suggest running **review-phase-story-breakdown**—do not silently rewrite other stories unless the user asks.
 
 ## Required output

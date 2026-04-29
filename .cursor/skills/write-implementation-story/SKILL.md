@@ -26,104 +26,104 @@ description: >-
 
 ## Fifteen traceability areas
 
-Stories use **fifteen** `##` sections in a fixed order. **decompose-phase-stories**, **review-phase-story-breakdown**, and **review-story-pre-implementation** all expect this same set—**do not omit a section** or rename headings. If a section is empty, write `None.` or a single honest placeholder (e.g. “N/A—no HTTP surface in this story.”).
+Stories use **fifteen** `##` sections in a fixed order, each titled with a **section number and name** (e.g. `## 1. Status`). **decompose-phase-stories**, **review-phase-story-breakdown**, and **review-story-pre-implementation** all expect this same set—**do not omit a section** or rename headings. If a section is empty, write `None.` or a single honest placeholder (e.g. “N/A—no HTTP surface in this story.”).
 
 ## Canonical section headings (all `story-*.md` files)
 
-The story **title** is one line: `# Story <n>: [Story Name]`. After that, these headings must appear **in this order**, with **exact** titles (spelling and spacing):
+The story **title** is one line: `# Story <n>: [Story Name]`. After that, these headings must appear **in this order**, with **exact** titles (number, spelling, spacing, and the period after the digit):
 
-1. `## Status`
-2. `## Goal`
-3. `## User Value`
-4. `## Spec References`
-5. `## In Scope`
-6. `## Out of Scope`
-7. `## API Changes`
-8. `## Data Model Changes`
-9. `## Business Rules`
-10. `## Acceptance Criteria`
-11. `## Test Requirements`
-12. `## Files Expected to Change`
-13. `## Implementation Notes`
-14. `## Human Review Checklist`
-15. `## Completion Notes`
+1. `## 1. Status`
+2. `## 2. Goal`
+3. `## 3. User Value`
+4. `## 4. Spec References`
+5. `## 5. In Scope`
+6. `## 6. Out of Scope`
+7. `## 7. API Changes`
+8. `## 8. Data Model Changes`
+9. `## 9. Business Rules`
+10. `## 10. Acceptance Criteria`
+11. `## 11. Test Requirements`
+12. `## 12. Files Expected to Change`
+13. `## 13. Implementation Notes`
+14. `## 14. Human Review Checklist`
+15. `## 15. Completion Notes`
 
 The **Required output template** block below is the expanded form of this list (same headings and order).
 
 ## Required output template (use verbatim structure)
 
-Replace bracketed placeholders with real content. Keep **all headings** and the **Acceptance Criteria** / **Test Requirements** / **Human Review Checklist** structure as written. For **`## Status`**, substitute **one** value from **Status lifecycle** (the template example uses **`Draft`** for new stories).
+Replace bracketed placeholders with real content. Keep **all headings** and the **Acceptance Criteria** / **Test Requirements** / **Human Review Checklist** structure as written. For **`## 1. Status`**, substitute **one** value from **Status lifecycle** (the template example uses **`Draft`** for new stories).
 
 ```markdown
 # Story X: [Story Name]
 
-## Status
+## 1. Status
 
 Draft
 
-## Goal
+## 2. Goal
 
 [One clear outcome.]
 
-## User Value
+## 3. User Value
 
 [Why this story matters.]
 
-## Spec References
+## 4. Spec References
 
 - spec.md: [section name]
 - api-contract.md: [section name]
 - data-model.md: [section name]
 - test-plan.md: [section name]
 
-## In Scope
+## 5. In Scope
 
 - [specific item]
 - [specific item]
 - [specific item]
 
-## Out of Scope
+## 6. Out of Scope
 
 - [explicit exclusions]
 - [future story items]
 - [future phase items]
 
-## API Changes
+## 7. API Changes
 
 [Endpoint, request, response, errors, or "None".]
 
-## Data Model Changes
+## 8. Data Model Changes
 
 [Entities, fields, constraints, or "None".]
 
-## Business Rules
+## 9. Business Rules
 
 - [rule]
 - [rule]
 
-## Acceptance Criteria
+## 10. Acceptance Criteria
 
 - [ ] Criterion 1
 - [ ] Criterion 2
 - [ ] Criterion 3
 
-## Test Requirements
+## 11. Test Requirements
 
 - [ ] Unit tests
 - [ ] API/controller tests
 - [ ] Repository tests, if applicable
 - [ ] Error case tests
 
-## Files Expected to Change
+## 12. Files Expected to Change
 
 - [path]
 - [path]
 
-## Implementation Notes
+## 13. Implementation Notes
 
 [Guidance for Cursor.]
 
-## Human Review Checklist
+## 14. Human Review Checklist
 
 - [ ] Scope matches story
 - [ ] No future story implemented
@@ -131,31 +131,30 @@ Draft
 - [ ] Public API matches spec
 - [ ] README/spec updates called out in the story ship **with** implementation when the story says so (not orphaned spec-only README edits for runtime behavior)
 
-## Completion Notes
+## 15. Completion Notes
 
 [Filled after implementation.]
 ```
 
 ## Status lifecycle
 
-Stories use a **single** `## Status` value. Allowed values and meaning:
+Stories use a **single** status word on the line(s) immediately under **`## 1. Status`**. Allowed values and meaning:
 
 | Status | When to use |
 |--------|----------------|
 | **Draft** | Story text is in progress or not yet approved for implementation. |
+| **Planned** | Story content is substantially drafted but **held for another review round** before **Approved**; not yet the active implementation story. |
 | **Approved** | Pre-implementation review passed (e.g. **review-story-pre-implementation**); safe to start coding as the **active** story. |
 | **In Progress** | Implementation underway. |
 | **Implemented** | Code changes merged or otherwise delivered for this story’s scope. |
 | **Reviewed** | Human or peer review of the implementation completed. |
 | **Complete** | Story scope and acceptance criteria verified; artifact closed. |
 
-**Deprecated / avoid:** **`Planned`** — do not use for new stories; use **`Draft`** until detail exists, then **`Approved`** after gate review. Existing files with **`Planned`** should be migrated to **`Draft`** or **`Approved`** as appropriate.
-
-**Pre-implementation gate:** **`review-story-pre-implementation`** expects **`Approved`** (or an explicit human waiver if the story remains **`Draft`**).
+**Pre-implementation gate:** **`review-story-pre-implementation`** expects **`Approved`** (or an explicit human waiver if the story remains **`Draft`** or **`Planned`**).
 
 ## Rules
 
-- **Status:** set exactly **one** value from the table above; never leave the template’s pipe-separated reminder as the literal file content unless the user explicitly wants a placeholder line.
+- **Status:** set exactly **one** value from the table above in **`## 1. Status`**; never leave the template’s pipe-separated reminder as the literal file content unless the user explicitly wants a placeholder line.
 - **Spec References:** use real relative links or `path: heading` as in existing phase stories; add rows for `03-acceptance-criteria.md` or ADRs when relevant.
 - **Traceability:** every **In Scope** bullet should be justified by **Spec References**; acceptance criteria must be objectively verifiable.
 - **Out of Scope:** always include explicit exclusions (avoids scope creep).
