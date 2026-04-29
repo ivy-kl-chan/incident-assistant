@@ -4,7 +4,7 @@
 
 ## 1. Status
 
-Approved
+Implemented
 
 ## 2. Goal
 
@@ -56,12 +56,12 @@ None.
 
 ## 10. Acceptance Criteria
 
-- [ ] Project builds with **Java 21** and **Spring Boot 3** using **Maven**.
-- [ ] Application starts locally; **`GET /actuator/health`** returns success when the process is up.
-- [ ] **`GET /actuator/health/readiness`** exists and behavior is **documented in root `README.md`** as part of this story’s implementation (including any interim state before DB wiring).
-- [ ] Actuator exposure matches **restricted** contract (health + readiness only).
-- [ ] **In the same implementation delivery as the code:** **root `README.md`** is updated with **prerequisites** (JDK 21, Maven), **bare JVM** build/run/test commands, **`GET /actuator/health`** / **`GET /actuator/health/readiness`**, **restricted** actuator exposure (health + readiness only), and **interim readiness** semantics before PostgreSQL is configured (**Story 2+**).
-- [ ] No `/api/v1/signal-ingest/*` and no incident APIs required for this story’s gate.
+- [x] Project builds with **Java 21** and **Spring Boot 3** using **Maven**.
+- [x] Application starts locally; **`GET /actuator/health`** returns success when the process is up.
+- [x] **`GET /actuator/health/readiness`** exists and behavior is **documented in root `README.md`** as part of this story’s implementation (including any interim state before DB wiring).
+- [x] Actuator exposure matches **restricted** contract (health + readiness only).
+- [x] **In the same implementation delivery as the code:** **root `README.md`** is updated with **prerequisites** (JDK 21, Maven), **bare JVM** build/run/test commands, **`GET /actuator/health`** / **`GET /actuator/health/readiness`**, **restricted** actuator exposure (health + readiness only), and **interim readiness** semantics before PostgreSQL is configured (**Story 2+**).
+- [x] No `/api/v1/signal-ingest/*` and no incident APIs required for this story’s gate.
 
 ## 11. Test Requirements
 
@@ -81,10 +81,14 @@ None.
 
 ## 14. Human Review Checklist
 
-- [ ] JDK and Spring versions match **1a** spec.
-- [ ] Actuator lock-down is acceptable for demo/security posture.
-- [ ] Interim readiness behavior is honest in docs.
+- [x] JDK and Spring versions match **1a** spec.
+- [x] Actuator lock-down is acceptable for demo/security posture.
+- [x] Interim readiness behavior is honest in docs.
 
 ## 15. Completion Notes
 
-*(Fill when implemented: PR link, ADR updates, any deviations.)*
+- **README:** Root [`README.md`](../../../../README.md) documents prerequisites (JDK 21, Maven), `mvn clean verify` / `mvn spring-boot:run`, restricted Actuator (health group only → liveness + readiness URLs), and **human-approved** interim readiness: `GET /actuator/health/readiness` returns **UP** before DB/Flyway; post–Story 2+ readiness will reflect DB per 1a contract.
+- **Tests:** `ActuatorHealthTest` (`@SpringBootTest`, Surefire default `*Test` pattern) covers health, readiness, and non-exposure of `/actuator/env`. `mvn test` runs this class.
+- **Build outputs:** `target/**` build artifacts were removed from version control; `.gitignore` already ignores `/target/`.
+- **PR link:** _add on merge_
+- **ADR updates:** none
