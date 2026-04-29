@@ -40,7 +40,7 @@ description: >-
 ## Workflow
 
 1. Confirm the **story file path** and **implementation evidence source** (diff/commits/PR scope).
-2. Verify story template compliance with **write-implementation-story** canonical headings and status lifecycle expectations.
+2. Verify story template compliance with **write-implementation-story** canonical numbered headings (`## 1. Status` … `## 15. Completion Notes`) and status lifecycle expectations.
 3. Build a traceability map:
    - **In Scope** -> changed files/code paths.
    - **Acceptance Criteria** -> concrete implementation and tests.
