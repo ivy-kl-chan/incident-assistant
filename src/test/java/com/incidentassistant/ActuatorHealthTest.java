@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class ActuatorHealthIT {
+class ActuatorHealthTest {
 
   @Autowired private TestRestTemplate restTemplate;
 

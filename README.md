@@ -15,8 +15,56 @@ Incident Assistant is a portfolio and learning demo. Ivy Chan owns product direc
 - **`specs/`** — product vision, architecture, phased roadmap, acceptance criteria, and **`specs/phases/`** per-phase detail: **1a** → [`phase-1a-monolith-core/`](specs/phases/phase-1a-monolith-core/spec.md), **1b** → [`phase-1b-signal-ingest/`](specs/phases/phase-1b-signal-ingest/spec.md) (1b after 1a).
 - **`docs/adr/`** — architecture decision records (kickoff tooling, Phase 1b delivery shape).
 - **`.cursor/rules/`** — Cursor project rules aligned with spec-driven delivery (optional for contributors using Cursor).
+- **Spring Boot monolith** — Java 21, Maven; health/readiness via Actuator (see [Local development](#local-development)).
 
-There is **no application code yet**; **Phase 1a** scaffold may start once the team schedules work—**kickoff decisions** below and in **`docs/adr/`** are recorded.
+## Local development
+
+### Prerequisites
+
+- **JDK 21**
+- **Maven** (3.9+ recommended)
+
+### Build, run, and test (bare JVM)
+
+From the repository root:
+
+```bash
+mvn clean verify
+```
+
+Run the application:
+
+```bash
+mvn spring-boot:run
+```
+
+Default HTTP port is **8080** unless overridden.
+
+### Actuator (restricted)
+
+Only the **health** endpoint group is exposed over HTTP. That yields:
+
+| Endpoint | Role |
+| -------- | ---- |
+| `GET /actuator/health` | Liveness — process is up. |
+| `GET /actuator/health/readiness` | Readiness probe URL (see interim semantics below). |
+
+Other actuator endpoints (for example `/actuator/env`, `/actuator/metrics`) are **not** exposed by default configuration.
+
+### Readiness (interim, before PostgreSQL)
+
+**Approved interim behavior:** Until persistence is wired (**Flyway / PostgreSQL**, later Phase 1a stories), `GET /actuator/health/readiness` returns **`200`** with aggregate **`"status":"UP"`** when the Spring application context is running. It does **not** yet verify database connectivity. After the database is configured, readiness will align with the Phase 1a contract (reflect DB availability for Docker and operations).
+
+### Quick checks
+
+With the app running:
+
+```bash
+curl -sSf http://localhost:8080/actuator/health
+curl -sSf http://localhost:8080/actuator/health/readiness
+```
+
+There is **no** `/api/v1/signal-ingest/*` in this scaffold; signal ingest arrives in Phase 1b per specs.
 
 ## Quick links
 
@@ -38,8 +86,8 @@ Engineers investigating incidents need assistance that is **grounded in evidence
 
 ## Roadmap at a glance
 
-1. **Phase 0** — Specifications _(you are here)_
-2. **Phase 1a** — Monolith core: Spring Boot, incident APIs + **draft lifecycle**, persistence, tests; **Dockerfile + compose (app + DB)** (**no AI**, **no OTel signals**)
+1. **Phase 0** — Specifications
+2. **Phase 1a** — Monolith core _(scaffold + health in progress; incident APIs and Docker compose follow per roadmap)_: Spring Boot, incident APIs + **draft lifecycle**, persistence, tests; **Dockerfile + compose (app + DB)** (**no AI**, **no OTel signals**)
 3. **Phase 1b** — **OpenTelemetry Demo in Docker** + **signals → draft** incidents (rule-based, CI uses doubles/fixtures) (**no AI**)
 4. **Phase 2** — LLM integration: mockable client, structured facts/assumptions/recommendations
 5. **Phase 3** — RAG: retrieval + **mandatory citations** when evidence is used
@@ -62,9 +110,9 @@ Details, dependencies, and risks: **[specs/02-roadmap.md](specs/02-roadmap.md)**
 
 Blocking and recommended questions from the **Summary** below are **answered**. Full prose and consequences: **[`docs/adr/0001-kickoff-tooling-testing-and-1a-scope.md`](docs/adr/0001-kickoff-tooling-testing-and-1a-scope.md)** and **[`docs/adr/0002-phase-1b-webhook-and-incremental-telemetry.md`](docs/adr/0002-phase-1b-webhook-and-incremental-telemetry.md)**.
 
-## Contributing (after code exists)
+## Contributing
 
-Commands for build and test will be added in **Phase 1a** when the project is scaffolded. Until then, contributions are **spec-only** unless explicitly agreed.
+Use **`mvn clean verify`** before submitting changes. Follow **`specs/`** and project rules in **`.cursor/rules/`** (Cursor optional). Feature work should match the active phase story and acceptance criteria.
 
 ## License
 
