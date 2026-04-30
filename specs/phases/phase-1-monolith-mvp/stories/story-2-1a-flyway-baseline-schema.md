@@ -4,7 +4,7 @@
 
 ## 1. Status
 
-Approved
+Implemented
 
 ## 2. Goal
 
@@ -56,10 +56,10 @@ None (schema only).
 
 ## 10. Acceptance Criteria
 
-- [ ] Flyway runs on an empty PostgreSQL database and applies exactly **`V1`** (no duplicate migrations).
-- [ ] Table/column types and nullability match **1a** + **1b** data-model docs (**`telemetry_context`** **JSONB**; **`signal_ingest_audit`** / **`signal_ingest_idempotency`** present); indexes match (**1b** dedup partial index included).
-- [ ] Integration test: migration succeeds on clean DB (per **1a** `test-plan.md`: Testcontainers normative).
-- [ ] No application incident API required for this story’s gate.
+- [x] Flyway runs on an empty PostgreSQL database and applies exactly **`V1`** (no duplicate migrations).
+- [x] Table/column types and nullability match **1a** + **1b** data-model docs (**`telemetry_context`** **JSONB**; **`signal_ingest_audit`** / **`signal_ingest_idempotency`** present); indexes match (**1b** dedup partial index included).
+- [x] Integration test: migration succeeds on clean DB (per **1a** `test-plan.md`: Testcontainers normative).
+- [x] No application incident API required for this story’s gate.
 
 ## 11. Test Requirements
 
@@ -82,4 +82,6 @@ None (schema only).
 
 ## 15. Completion Notes
 
-*(Fill when implemented.)*
+- **2026-04-30:** Flyway **`V1`** baseline added (`src/main/resources/db/migration/V1__baseline_incidents_and_signal_ingest.sql`), JDBC + PostgreSQL + Flyway 10 (`flyway-core`, `flyway-database-postgresql`; Spring Boot **3.4** does not publish `spring-boot-starter-flyway` in the BOM). Datasource defaults in `application.yml` with env overrides.
+- **Tests:** `FlywayV1BaselineIntegrationTest` (Testcontainers PostgreSQL, `@Testcontainers(disabledWithoutDocker = true)`). `ActuatorHealthTest` excludes `DataSource` / Flyway so actuator checks stay runnable without Docker; migration coverage remains on Testcontainers when Docker is available.
+- **Human `Complete`:** pending human sign-off per `review-story-implementation` / checklist §14.

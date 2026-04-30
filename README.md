@@ -15,7 +15,7 @@ Incident Assistant is a portfolio and learning demo. Ivy Chan owns product direc
 - **`specs/`** — product vision, architecture, phased roadmap, acceptance criteria, and **`specs/phases/`** per-phase detail: **1a** → [`phase-1a-monolith-core/`](specs/phases/phase-1a-monolith-core/spec.md), **1b** → [`phase-1b-signal-ingest/`](specs/phases/phase-1b-signal-ingest/spec.md) (1b after 1a).
 - **`docs/adr/`** — architecture decision records (kickoff tooling, Phase 1b delivery shape).
 - **`.cursor/rules/`** — Cursor project rules aligned with spec-driven delivery (optional for contributors using Cursor).
-- **Spring Boot monolith** — Java 21, Maven; health/readiness via Actuator (see [Local development](#local-development)).
+- **Spring Boot monolith** — Java 21, Maven; **Flyway `V1`** baseline schema (PostgreSQL); health/readiness via Actuator (see [Local development](#local-development)).
 
 ## Local development
 
@@ -23,6 +23,8 @@ Incident Assistant is a portfolio and learning demo. Ivy Chan owns product direc
 
 - **JDK 21**
 - **Maven** (3.9+ recommended)
+- **PostgreSQL** reachable at the JDBC URL in [`application.yml`](src/main/resources/application.yml) (defaults: host `localhost`, database `incident_assistant`, user/password `incident_assistant`) or override with `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, and `SPRING_DATASOURCE_PASSWORD`.
+- **Docker** (optional but recommended): integration tests that apply **Flyway** against a clean database use **Testcontainers** with PostgreSQL. If Docker is not running, those tests are **skipped** (`disabledWithoutDocker = true`). CI environments that enforce the Phase 1a test plan should run builds with Docker so the migration test executes.
 
 ### Build, run, and test (bare JVM)
 
@@ -51,9 +53,11 @@ Only the **health** endpoint group is exposed over HTTP. That yields:
 
 Other actuator endpoints (for example `/actuator/env`, `/actuator/metrics`) are **not** exposed by default configuration.
 
-### Readiness (interim, before PostgreSQL)
+### Readiness and the database
 
-**Approved interim behavior:** Until persistence is wired (**Flyway / PostgreSQL**, later Phase 1a stories), `GET /actuator/health/readiness` returns **`200`** with aggregate **`"status":"UP"`** when the Spring application context is running. It does **not** yet verify database connectivity. After the database is configured, readiness will align with the Phase 1a contract (reflect DB availability for Docker and operations).
+When the application starts **with** JDBC and a live PostgreSQL instance (normal `mvn spring-boot:run` after the database exists), Spring Boot’s readiness probe can reflect **database** availability like any standard JDBC-backed service.
+
+The **`ActuatorHealthTest`** suite intentionally starts a slice **without** `DataSource` / Flyway auto-configuration so actuator HTTP exposure and the **approved interim aggregate `"UP"`** readiness behavior can be asserted **without** Docker or a local database in minimal environments. Full **Flyway `V1`** application on an empty database is covered by **`FlywayV1BaselineIntegrationTest`** (Testcontainers; requires Docker when not skipped).
 
 ### Quick checks
 
