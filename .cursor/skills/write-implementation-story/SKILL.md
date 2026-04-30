@@ -164,3 +164,7 @@ Stories use a **single** status word on the line(s) immediately under **`## 1. S
 ## Relation to decompose-phase-stories
 
 **decompose-phase-stories** owns phase inputs, story count, ordering, dependencies, and `stories/` naming; it **requires** this file’s template and **Canonical section headings** for every story body. Use **write-implementation-story** alone when the user only wants one story written or normalized to this template without a full phase pass.
+
+## Relation to implement-story
+
+**implement-story** drives coding against **one** `story-*.md` that follows this template and lifecycle (**Approved** → **In Progress** → **Implemented**). Authoring and status semantics here; execution and project invariants there.

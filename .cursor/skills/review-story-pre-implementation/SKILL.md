@@ -28,6 +28,7 @@ description: >-
 | **review-phase-story-breakdown** | Entire `stories/` set for a phase: coverage, ordering, independence across stories. |
 | **review-spec-chat-scope** | Spec documents tied to the chat; not necessarily one story file. |
 | **review-story-pre-implementation** (this) | **One** active `story-*.md` as a **pre-coding gate**: is this story ready to implement safely and traceably? |
+| **implement-story** | **After** this gate: execute the **approved** story (code, tests, story artifact updates) per project rules. |
 
 ## Scope
 

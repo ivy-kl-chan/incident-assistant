@@ -25,6 +25,7 @@ description: >-
 | **review-story-pre-implementation** | One story quality gate **before coding**. |
 | **review-phase-story-breakdown** | Entire phase story set quality, sequencing, and coverage. |
 | **review-story-implementation** (this) | One story **after implementation**: does code and test evidence match the story and specs? |
+| **implement-story** | Produces the implementation and tests that this skill **reviews**; use after **review-story-pre-implementation** and coding. |
 
 ## Scope
 

@@ -30,7 +30,7 @@ This project must follow **specification-driven development**.
 
 ## Cursor project skills (`.cursor/skills/`)
 
-- **Naming:** Each skill’s directory name and YAML `name` field use **action-first** kebab-case: a **verb** (or clear verb phrase) comes first, then the object or scope (e.g. `review-spec-chat-scope`, `write-implementation-story`, `decompose-phase-stories`). Do not introduce new skills that put the object before the verb (e.g. avoid `spec-review-…`, `phase-…-breakdown`).
+- **Naming:** Each skill’s directory name and YAML `name` field use **action-first** kebab-case: a **verb** (or clear verb phrase) comes first, then the object or scope (e.g. `review-spec-chat-scope`, `write-implementation-story`, `implement-story`, `decompose-phase-stories`). Do not introduce new skills that put the object before the verb (e.g. avoid `spec-review-…`, `phase-…-breakdown`).
 
 ## Story-based implementation (per phase)
 
