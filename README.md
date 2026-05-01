@@ -23,7 +23,6 @@ Incident Assistant is a portfolio and learning demo. Ivy Chan owns product direc
 
 - **JDK 21**
 - **Maven** (3.9+ recommended)
-- **Testcontainers** with PostgreSQL. If Docker is not running, those tests are **skipped** (`disabledWithoutDocker = true`). CI environments that enforce the Phase 1a test plan should run builds with Docker so the migration test executes.
 - **Docker** (recommended): integration tests that use **Testcontainers** (PostgreSQL, Flyway migrations) need a Docker daemon. If Docker is not available, those tests may be **skipped** (`@Testcontainers(disabledWithoutDocker = true)`). **`mvn verify`** matches full Phase **1a** coverage when Docker runs locally or in CI.
   > > > > > > > main
 
