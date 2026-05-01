@@ -23,6 +23,7 @@ Incident Assistant is a portfolio and learning demo. Ivy Chan owns product direc
 
 - **JDK 21**
 - **Maven** (3.9+ recommended)
+- **Docker** (recommended): integration tests that use **Testcontainers** (PostgreSQL, Flyway migrations) need a Docker daemon. If Docker is not available, those tests may be **skipped** (`@Testcontainers(disabledWithoutDocker = true)`). **`mvn verify`** matches full Phase **1a** coverage when Docker runs locally or in CI.
 
 ### Build, run, and test (bare JVM)
 
@@ -113,6 +114,17 @@ Blocking and recommended questions from the **Summary** below are **answered**. 
 ## Contributing
 
 Use **`mvn clean verify`** before submitting changes. Follow **`specs/`** and project rules in **`.cursor/rules/`** (Cursor optional). Feature work should match the active phase story and acceptance criteria.
+
+## Continuous integration
+
+**GitHub Actions** is the default CI host. Workflow: **[`.github/workflows/ci.yml`](.github/workflows/ci.yml)**.
+
+| Trigger | Behavior |
+| ------- | -------- |
+| **`pull_request`** targeting **`main`** | Runs **`mvn --batch-mode verify`** on **`ubuntu-latest`** with **JDK 21** (Temurin). |
+| **`push`** to **`main`** | Same job. |
+
+Hosted runners provide **Docker**, so **Testcontainers** integration tests **run** there instead of being skipped. Image pulls (for example **`postgres:16-alpine`**) require outbound network access from the runner.
 
 ## License
 
