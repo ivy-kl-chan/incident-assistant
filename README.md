@@ -23,8 +23,9 @@ Incident Assistant is a portfolio and learning demo. Ivy Chan owns product direc
 
 - **JDK 21**
 - **Maven** (3.9+ recommended)
-- **PostgreSQL** reachable at the JDBC URL in [`application.yml`](src/main/resources/application.yml) (defaults: host `localhost`, database `incident_assistant`, user/password `incident_assistant`) or override with `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, and `SPRING_DATASOURCE_PASSWORD`.
-- **Docker** (optional but recommended): integration tests that apply **Flyway** against a clean database use **Testcontainers** with PostgreSQL. If Docker is not running, those tests are **skipped** (`disabledWithoutDocker = true`). CI environments that enforce the Phase 1a test plan should run builds with Docker so the migration test executes.
+- **Testcontainers** with PostgreSQL. If Docker is not running, those tests are **skipped** (`disabledWithoutDocker = true`). CI environments that enforce the Phase 1a test plan should run builds with Docker so the migration test executes.
+- **Docker** (recommended): integration tests that use **Testcontainers** (PostgreSQL, Flyway migrations) need a Docker daemon. If Docker is not available, those tests may be **skipped** (`@Testcontainers(disabledWithoutDocker = true)`). **`mvn verify`** matches full Phase **1a** coverage when Docker runs locally or in CI.
+  > > > > > > > main
 
 ### Build, run, and test (bare JVM)
 
@@ -46,9 +47,9 @@ Default HTTP port is **8080** unless overridden.
 
 Only the **health** endpoint group is exposed over HTTP. That yields:
 
-| Endpoint | Role |
-| -------- | ---- |
-| `GET /actuator/health` | Liveness — process is up. |
+| Endpoint                         | Role                                               |
+| -------------------------------- | -------------------------------------------------- |
+| `GET /actuator/health`           | Liveness — process is up.                          |
 | `GET /actuator/health/readiness` | Readiness probe URL (see interim semantics below). |
 
 Other actuator endpoints (for example `/actuator/env`, `/actuator/metrics`) are **not** exposed by default configuration.
@@ -81,8 +82,8 @@ There is **no** `/api/v1/signal-ingest/*` in this scaffold; signal ingest arrive
 | [specs/phases/phase-1a-monolith-core/spec.md](specs/phases/phase-1a-monolith-core/spec.md) | **Phase 1a** — manual incidents, Docker baseline (API, model, tests)              |
 | [specs/phases/phase-1b-signal-ingest/spec.md](specs/phases/phase-1b-signal-ingest/spec.md) | **Phase 1b** — signal ingest, OTel Demo (after 1a)                                |
 | [specs/openapi/openapi-1a.yaml](specs/openapi/openapi-1a.yaml)                             | OpenAPI for **1a**                                                                |
-| [specs/openapi/openapi-1b.yaml](specs/openapi/openapi-1b.yaml)                             | OpenAPI for **1b** (ingest + extended reads; merge with 1a)                        |
-| [docs/adr/README.md](docs/adr/README.md)                                                 | Architecture decision records (ADR index)                                         |
+| [specs/openapi/openapi-1b.yaml](specs/openapi/openapi-1b.yaml)                             | OpenAPI for **1b** (ingest + extended reads; merge with 1a)                       |
+| [docs/adr/README.md](docs/adr/README.md)                                                   | Architecture decision records (ADR index)                                         |
 
 ## Vision (one paragraph)
 
@@ -118,6 +119,17 @@ Blocking and recommended questions from the **Summary** below are **answered**. 
 
 Use **`mvn clean verify`** before submitting changes. Follow **`specs/`** and project rules in **`.cursor/rules/`** (Cursor optional). Feature work should match the active phase story and acceptance criteria.
 
+## Continuous integration
+
+**GitHub Actions** is the default CI host. Workflow: **[`.github/workflows/ci.yml`](.github/workflows/ci.yml)**.
+
+| Trigger                                 | Behavior                                                                             |
+| --------------------------------------- | ------------------------------------------------------------------------------------ |
+| **`pull_request`** targeting **`main`** | Runs **`mvn --batch-mode verify`** on **`ubuntu-latest`** with **JDK 21** (Temurin). |
+| **`push`** to **`main`**                | Same job.                                                                            |
+
+Hosted runners provide **Docker**, so **Testcontainers** integration tests **run** there instead of being skipped. Image pulls (for example **`postgres:16-alpine`**) require outbound network access from the runner.
+
 ## License
 
 _To be determined by repository owner._
@@ -144,31 +156,31 @@ _To be determined by repository owner._
 
 **Must decide — resolved**
 
-| # | Topic | Decision |
-|---|--------|----------|
-| 1 | Build tool | **Maven** |
-| 2 | CI vs local DB | **Testcontainers (PostgreSQL) from day one** for default integration tests |
-| 3 | API style | **REST** for all phases (resource JSON HTTP) |
-| 4 | 1a vs 1b scope | **1a:** minimum fields/ops per **`specs/phases/phase-1a-monolith-core/`** (manual create/get/list + draft lifecycle). **1b:** **webhook-style** HTTP ingest to this service (not poll-from-JVM as primary); signals detailed in phase specs |
-| 5 | Docs home | **`specs/` + README + `docs/adr/`** (ADRs **0001**, **0002**) |
+| #   | Topic          | Decision                                                                                                                                                                                                                                    |
+| --- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Build tool     | **Maven**                                                                                                                                                                                                                                   |
+| 2   | CI vs local DB | **Testcontainers (PostgreSQL) from day one** for default integration tests                                                                                                                                                                  |
+| 3   | API style      | **REST** for all phases (resource JSON HTTP)                                                                                                                                                                                                |
+| 4   | 1a vs 1b scope | **1a:** minimum fields/ops per **`specs/phases/phase-1a-monolith-core/`** (manual create/get/list + draft lifecycle). **1b:** **webhook-style** HTTP ingest to this service (not poll-from-JVM as primary); signals detailed in phase specs |
+| 5   | Docs home      | **`specs/` + README + `docs/adr/`** (ADRs **0001**, **0002**)                                                                                                                                                                               |
 
 **Should decide — resolved**
 
-| # | Topic | Decision |
-|---|--------|----------|
-| 1 | Demo narrative | **Single vertical** playbook for later RAG/demo cohesion (content can grow iteratively) |
-| 2 | OTel Demo + signals | **Minimal compose profile**; Phase **1b** split into stories: **metrics first**, then **traces**, then **logs** (each own backlog story) |
-| 3 | OpenAPI | **In Phase 1** (maintain **`specs/openapi/`** with controllers) |
-| 4 | End-user auth | **Out of scope** until a named later phase (ingest **token** remains per **1b** `api-contract.md`) |
-| 5 | Observability in **1a** | **Logs only** (no Micrometer tracing baseline in **1a**) |
-| 6 | Stretch **6–7** | **TBD** vs portfolio timeline—remain **optional** until promoted |
+| #   | Topic                   | Decision                                                                                                                                 |
+| --- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Demo narrative          | **Single vertical** playbook for later RAG/demo cohesion (content can grow iteratively)                                                  |
+| 2   | OTel Demo + signals     | **Minimal compose profile**; Phase **1b** split into stories: **metrics first**, then **traces**, then **logs** (each own backlog story) |
+| 3   | OpenAPI                 | **In Phase 1** (maintain **`specs/openapi/`** with controllers)                                                                          |
+| 4   | End-user auth           | **Out of scope** until a named later phase (ingest **token** remains per **1b** `api-contract.md`)                                       |
+| 5   | Observability in **1a** | **Logs only** (no Micrometer tracing baseline in **1a**)                                                                                 |
+| 6   | Stretch **6–7**         | **TBD** vs portfolio timeline—remain **optional** until promoted                                                                         |
 
 **Assumptions — validated**
 
-| # | Assumption | Validated |
-|---|------------|-----------|
-| 1 | JDK **21** everywhere | **Yes** |
-| 2 | **English-only** UI/API for demo | **Yes** |
-| 3 | No real vendor SLA in v1; OTel Demo as reference | **Yes** |
+| #   | Assumption                                       | Validated |
+| --- | ------------------------------------------------ | --------- |
+| 1   | JDK **21** everywhere                            | **Yes**   |
+| 2   | **English-only** UI/API for demo                 | **Yes**   |
+| 3   | No real vendor SLA in v1; OTel Demo as reference | **Yes**   |
 
 Implementation plans under **`specs/phases/`** track execution; ADRs above are the durable record.

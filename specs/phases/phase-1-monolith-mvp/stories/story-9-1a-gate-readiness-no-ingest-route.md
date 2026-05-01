@@ -24,6 +24,7 @@ Operators can trust readiness probes once the DB is wired; contributors have a c
 | [`../../phase-1a-monolith-core/test-plan.md`](../../phase-1a-monolith-core/test-plan.md) | Policy B CI; Testcontainers |
 | [`../../phase-1a-monolith-core/implementation-plan.md`](../../phase-1a-monolith-core/implementation-plan.md) | M6 **1a** gate |
 | [`../../../03-acceptance-criteria.md`](../../../03-acceptance-criteria.md) | Phase **1a** DoD (see Out of Scope for items this story set intentionally omits) |
+| [`story-18-1a-pr-ci-docker-for-testcontainers.md`](story-18-1a-pr-ci-docker-for-testcontainers.md) | **PR CI + Docker** so Testcontainers tests (e.g. **`FlywayV1BaselineIntegrationTest`**) **run**, not skip, in default CI |
 
 ## 5. In Scope
 
@@ -56,7 +57,7 @@ None.
 - [ ] Readiness status accurately reports DB up/down in integration tests or manual checklist (documented).
 - [ ] README enables clone → configure DB → run app → hit **health** + **incident** smoke path on **bare metal**.
 - [ ] Confirmed: **`POST /api/v1/signal-ingest/*`** not registered in **1a** delivery.
-- [ ] **1a** `test-plan.md` scenarios achievable green in default CI (PostgreSQL via Testcontainers).
+- [ ] **1a** `test-plan.md` scenarios achievable green in default CI (PostgreSQL via Testcontainers), including **[Story 18](story-18-1a-pr-ci-docker-for-testcontainers.md)** merged so Testcontainers-backed tests **execute** (not skipped for missing Docker).
 
 ## 11. Test Requirements
 
@@ -69,11 +70,12 @@ None.
 ## 13. Implementation Notes
 
 - **Story 8** closes the **1a** container/image/compose items in **`03-acceptance-criteria.md`**; **this story (9)** remains the **integration gate** for readiness semantics, **no ingest route**, and **test-plan** green for **1a** APIs.
-- **`specs/03-acceptance-criteria.md`** Phase **1a** DoD requires **Stories 1–9** together (**Story 8** + **Story 9** jointly satisfy image/compose/readiness/no-ingest expectations).
+- **`specs/03-acceptance-criteria.md`** Phase **1a** DoD requires **Stories 1–9** together (**Story 8** + **Story 9** jointly satisfy image/compose/readiness/no-ingest expectations), with **[Story 18](story-18-1a-pr-ci-docker-for-testcontainers.md)** merged so **default CI** exercises **Testcontainers** (not skipped).
+- **Story 18** supplies **default PR CI with Docker** for **Testcontainers**; without it, **Story 9** acceptance on “green default CI” is **not** satisfied.
 
 ## 14. Human Review Checklist
 
-- [ ] **1a** DoD items covered by **Stories 1–9** are checked off in release notes.
+- [ ] **1a** DoD items covered by **Stories 1–9** and **Story 18** (PR CI + Docker) are checked off in release notes.
 - [ ] Readiness semantics match **`api-contract.md`** when DB is up/down.
 
 ## 15. Completion Notes

@@ -11,4 +11,6 @@ Detailed specifications were **split** so **1a** and **1b** requirements are not
 
 Implementation stories (numbered in **implementation order**): Markdown files in [`stories/`](stories/) (`story-*.md`).
 
+**CI prerequisite:** Merge **[Story 18 — PR CI with Docker for Testcontainers](stories/story-18-1a-pr-ci-docker-for-testcontainers.md)** before treating the **[Story 9](stories/story-9-1a-gate-readiness-no-ingest-route.md)** “green default CI with Testcontainers” criterion as satisfied (file number **18** reflects insert after the original **1–17** breakdown, not late-phase scope).
+
 The previous combined files in this folder were removed to avoid duplicate sources of truth.
