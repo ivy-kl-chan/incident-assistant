@@ -1,10 +1,10 @@
 # Story 2: Phase 1a — Flyway V1 baseline (reserved 1b columns)
 
-*Label: Shared schema baseline*
+_Label: Shared schema baseline_
 
 ## 1. Status
 
-Approved
+Completed
 
 ## 2. Goal
 
@@ -16,16 +16,16 @@ All subsequent persistence work shares one forward-only schema baseline compatib
 
 ## 4. Spec References
 
-| Document | Relevance |
-|----------|-----------|
-| [`../README.md`](../README.md) | Phase pointer to **1a** / **1b** |
-| [`../../phase-1a-monolith-core/data-model.md`](../../phase-1a-monolith-core/data-model.md) | **`V1`** shape: **1a** columns + nullable **1b** columns + indexes |
-| [`../../phase-1b-signal-ingest/data-model.md`](../../phase-1b-signal-ingest/data-model.md) | Partial index; **`signal_ingest_audit`**, **`signal_ingest_idempotency`** (included in **`V1`** per approval) |
-| [`../../phase-1a-monolith-core/spec.md`](../../phase-1a-monolith-core/spec.md) | One **`V1`** baseline; **1a** app must not use **1b** columns until **1b** stories |
-| [`../../phase-1a-monolith-core/implementation-plan.md`](../../phase-1a-monolith-core/implementation-plan.md) | M1: Flyway **`V1` only** |
-| [`../../phase-1a-monolith-core/test-plan.md`](../../phase-1a-monolith-core/test-plan.md) | Integration: Flyway on empty DB; **Testcontainers** normative |
-| [`../../../03-acceptance-criteria.md`](../../../03-acceptance-criteria.md) | Phase 1a: schema managed by agreed approach (e.g. Flyway) |
-| [`../../phase-1a-monolith-core/api-contract.md`](../../phase-1a-monolith-core/api-contract.md) | No new paths; **`transitionReason`** on **`Incident`** clarified with **`data-model.md`** (**1a**: null, no column) |
+| Document                                                                                                     | Relevance                                                                                                           |
+| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| [`../README.md`](../README.md)                                                                               | Phase pointer to **1a** / **1b**                                                                                    |
+| [`../../phase-1a-monolith-core/data-model.md`](../../phase-1a-monolith-core/data-model.md)                   | **`V1`** shape: **1a** columns + nullable **1b** columns + indexes                                                  |
+| [`../../phase-1b-signal-ingest/data-model.md`](../../phase-1b-signal-ingest/data-model.md)                   | Partial index; **`signal_ingest_audit`**, **`signal_ingest_idempotency`** (included in **`V1`** per approval)       |
+| [`../../phase-1a-monolith-core/spec.md`](../../phase-1a-monolith-core/spec.md)                               | One **`V1`** baseline; **1a** app must not use **1b** columns until **1b** stories                                  |
+| [`../../phase-1a-monolith-core/implementation-plan.md`](../../phase-1a-monolith-core/implementation-plan.md) | M1: Flyway **`V1` only**                                                                                            |
+| [`../../phase-1a-monolith-core/test-plan.md`](../../phase-1a-monolith-core/test-plan.md)                     | Integration: Flyway on empty DB; **Testcontainers** normative                                                       |
+| [`../../../03-acceptance-criteria.md`](../../../03-acceptance-criteria.md)                                   | Phase 1a: schema managed by agreed approach (e.g. Flyway)                                                           |
+| [`../../phase-1a-monolith-core/api-contract.md`](../../phase-1a-monolith-core/api-contract.md)               | No new paths; **`transitionReason`** on **`Incident`** clarified with **`data-model.md`** (**1a**: null, no column) |
 
 ## 5. In Scope
 
@@ -68,7 +68,7 @@ None (schema only).
 
 ## 12. Files Expected to Change
 
-- **`src/main/resources/db/migration/V1__....sql`**, Flyway config in **`application*.yml`**, **`pom.xml`** if dependencies added, integration tests under **`src/test/java/**`**.
+- **`src/main/resources/db/migration/V1__....sql`**, Flyway config in **`application*.yml`**, **`pom.xml`** if dependencies added, integration tests under **`src/test/java/**`\*\*.
 
 ## 13. Implementation Notes
 
@@ -82,4 +82,4 @@ None (schema only).
 
 ## 15. Completion Notes
 
-*(Fill when implemented.)*
+_(Fill when implemented.)_
