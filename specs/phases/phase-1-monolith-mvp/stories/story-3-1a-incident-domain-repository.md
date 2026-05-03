@@ -4,7 +4,7 @@
 
 ## 1. Status
 
-Approved
+Implemented
 
 ## 2. Goal
 
@@ -59,12 +59,12 @@ None beyond Story **2** (uses existing **`incidents`** table).
 
 ## 10. Acceptance Criteria
 
-- [ ] Can persist a new incident as **`DRAFT`** with valid title/severity via service/repository API used by tests.
-- [ ] Invalid **title** / **severity** / **description** (length after trim) rejected with clear domain/service errors mappable later to **HTTP 400**.
-- [ ] **`source`** column stored as **`MANUAL`**; **1b** columns remain untouched (null).
-- [ ] **`version`** behavior documented for updates (increment on successful mutation).
-- [ ] **`created_at`** and **`updated_at`** set on insert; **`updated_at`** (and **`version`**) updated on successful mutation; documented in code or short **Javadoc** on the service/repository responsible.
-- [ ] Update path rejects **`title`**/**`description`**/**`severity`** changes when status is **`CLOSED`** or **`CANCELLED`**, with errors mappable to **409**.
+- [x] Can persist a new incident as **`DRAFT`** with valid title/severity via service/repository API used by tests.
+- [x] Invalid **title** / **severity** / **description** (length after trim) rejected with clear domain/service errors mappable later to **HTTP 400**.
+- [x] **`source`** column stored as **`MANUAL`**; **1b** columns remain untouched (null).
+- [x] **`version`** behavior documented for updates (increment on successful mutation).
+- [x] **`created_at`** and **`updated_at`** set on insert; **`updated_at`** (and **`version`**) updated on successful mutation; documented in code or short **Javadoc** on the service/repository responsible.
+- [x] Update path rejects **`title`**/**`description`**/**`severity`** changes when status is **`CLOSED`** or **`CANCELLED`**, with errors mappable to **409**.
 
 ## 11. Test Requirements
 
@@ -90,4 +90,7 @@ None beyond Story **2** (uses existing **`incidents`** table).
 
 ## 15. Completion Notes
 
-*(Fill when implemented.)*
+- **Date:** 2026-05-02
+- **Summary:** Domain types, `IncidentValidator`, `ManualIncidentService`, port `ManualIncidentRepository`, and `JdbcManualIncidentRepository` (insert/update with optimistic CAS). Persistence beans are `@ConditionalOnBean(JdbcTemplate.class)` so tests that exclude `DataSource` (e.g. actuator slice) still start.
+- **Tests:** `IncidentValidatorTest`, `ManualIncidentServiceTest`, `ManualIncidentRepositoryIntegrationTest` (Testcontainers PostgreSQL; skipped when Docker unavailable via `@Testcontainers(disabledWithoutDocker = true)`).
+- **PR/commit:** *(none yet — local implementation)*
