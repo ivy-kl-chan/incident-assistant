@@ -9,7 +9,20 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+/**
+ * Actuator wiring without a real database (persistence is covered by {@link
+ * FlywayV1BaselineIntegrationTest}). Matches approved interim readiness semantics until a later
+ * story wires readiness to the database for the same process layout.
+ */
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+    properties = {
+      "spring.autoconfigure.exclude="
+          + "org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,"
+          + "org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration,"
+          + "org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration,"
+          + "org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration"
+    })
 class ActuatorHealthTest {
 
   @Autowired private TestRestTemplate restTemplate;

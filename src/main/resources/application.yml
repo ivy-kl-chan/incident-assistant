@@ -1,6 +1,13 @@
 spring:
   application:
     name: incident-assistant
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/incident_assistant}
+    username: ${SPRING_DATASOURCE_USERNAME:incident_assistant}
+    password: ${SPRING_DATASOURCE_PASSWORD:incident_assistant}
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
 
 management:
   endpoints:
