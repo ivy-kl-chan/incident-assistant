@@ -15,7 +15,7 @@ Incident Assistant is a portfolio and learning demo. Ivy Chan owns product direc
 - **`specs/`** — product vision, architecture, phased roadmap, acceptance criteria, and **`specs/phases/`** per-phase detail: **1a** → [`phase-1a-monolith-core/`](specs/phases/phase-1a-monolith-core/spec.md), **1b** → [`phase-1b-signal-ingest/`](specs/phases/phase-1b-signal-ingest/spec.md) (1b after 1a).
 - **`docs/adr/`** — architecture decision records (kickoff tooling, Phase 1b delivery shape).
 - **`.cursor/rules/`** — Cursor project rules aligned with spec-driven delivery (optional for contributors using Cursor).
-- **Spring Boot monolith** — Java 21, Maven; **Flyway `V1`** baseline schema (PostgreSQL); health/readiness via Actuator (see [Local development](#local-development)).
+- **Spring Boot monolith** — Java 21, Maven; **Flyway `V1`** baseline schema (PostgreSQL); Phase **1a** incidents REST (`/api/v1/incidents`); health/readiness via Actuator (see [Local development](#local-development)).
 
 ## Local development
 
@@ -101,6 +101,17 @@ With the app running:
 curl -sSf http://localhost:8080/actuator/health
 curl -sSf http://localhost:8080/actuator/health/readiness
 ```
+
+### Incidents HTTP (Phase 1a)
+
+Normative contract: **[`specs/phases/phase-1a-monolith-core/api-contract.md`](specs/phases/phase-1a-monolith-core/api-contract.md)**.
+
+- **`POST /api/v1/incidents`** — JSON body (`application/json`); creates **`DRAFT`** / **`MANUAL`** incidents only.
+- **`GET /api/v1/incidents/{id}`** — **`404`** if missing; **`ETag`** on this response is added in a later story (Story 5).
+- **`GET /api/v1/incidents`** — paginated list (`page`, `size`, optional `status`, `sort`); unknown query parameters → **`400`** (including `source` in 1a).
+- **`X-Request-Id`** — echoed when the client sends it; otherwise generated per response.
+- **POST body size** — max **1 MiB** via **`server.tomcat.max-http-form-post-size`**; larger payloads → **`413`** from the container.
+- **Availability** — JDBC failures on list/get map to **`503`** with a minimal JSON error body (see `ApiExceptionHandler`).
 
 There is **no** `/api/v1/signal-ingest/*` in this scaffold; signal ingest arrives in Phase 1b per specs.
 

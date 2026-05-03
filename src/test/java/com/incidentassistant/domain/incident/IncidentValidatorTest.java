@@ -15,6 +15,13 @@ class IncidentValidatorTest {
   }
 
   @Test
+  void validateTitle_rejectsNull() {
+    assertThatThrownBy(() -> IncidentValidator.validateTitle(null))
+        .isInstanceOf(IncidentValidationException.class)
+        .hasMessageContaining("title");
+  }
+
+  @Test
   void validateTitle_rejectsTooShortAfterTrim() {
     assertThatThrownBy(() -> IncidentValidator.validateTitle("   "))
         .isInstanceOf(IncidentValidationException.class)
@@ -63,8 +70,9 @@ class IncidentValidatorTest {
   }
 
   @Test
-  void validateSeverity_requiresNonNull() {
+  void validateSeverity_requiresValue() {
     assertThatThrownBy(() -> IncidentValidator.validateSeverity(null))
-        .isInstanceOf(NullPointerException.class);
+        .isInstanceOf(IncidentValidationException.class)
+        .hasMessageContaining("severity");
   }
 }

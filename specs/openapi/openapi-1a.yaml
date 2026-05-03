@@ -31,15 +31,32 @@ paths:
             enum: ["createdAt,asc", "createdAt,desc"]
             default: "createdAt,desc"
       responses:
-        "200": { description: Paged IncidentSummary }
+        "200":
+          description: Paged IncidentSummary (manual incidents only in 1a)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PagedIncidents" }
         "400": { description: Bad query }
         "503": { description: Persistence unavailable }
     post:
       tags: [Incidents]
       summary: Create incident (DRAFT, MANUAL)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateIncidentRequest" }
       responses:
-        "201": { description: Created }
-        "400": { description: Validation }
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Incident" }
+        "400":
+          description: Validation (e.g. missing title or severity)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MinimalError" }
         "413": { description: Payload too large }
         "415": { description: Unsupported media type }
   /api/v1/incidents/{id}:
@@ -49,11 +66,18 @@ paths:
         - $ref: "#/components/parameters/IncidentId"
       responses:
         "200":
-          description: Incident 1a shape; includes strong ETag (quoted decimal version) per api-contract.md
+          description: >
+            Incident (Phase 1a wire shape). api-contract.md requires a strong ETag on this response
+            for the Phase 1a gate; the Story 4 implementation does not emit ETag yet (see Story 5).
           headers:
             ETag:
-              required: true
+              required: false
+              description: >
+                RFC 9110 opaque entity-tag (quoted decimal version). Implemented in Story 5; omitted in Story 4.
               schema: { type: string, example: '"7"' }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Incident" }
         "404": { description: Not found }
         "503": { description: Persistence unavailable }
     patch:
@@ -88,6 +112,64 @@ paths:
       responses:
         "200": { description: UP }
 components:
+  schemas:
+    MinimalError:
+      type: object
+      properties:
+        detail:
+          type: string
+      required: [detail]
+    CreateIncidentRequest:
+      type: object
+      required: [title, severity]
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          nullable: true
+          maxLength: 32768
+        severity:
+          type: string
+          enum: [SEV1, SEV2, SEV3, SEV4]
+    IncidentSummary:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string }
+        status:
+          type: string
+          enum: [DRAFT, OPEN, CLOSED, CANCELLED]
+        severity:
+          type: string
+          enum: [SEV1, SEV2, SEV3, SEV4]
+        source:
+          type: string
+          enum: [MANUAL]
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        version: { type: integer, format: int64 }
+      required: [id, title, status, severity, source, createdAt, updatedAt, version]
+    Incident:
+      allOf:
+        - $ref: "#/components/schemas/IncidentSummary"
+        - type: object
+          properties:
+            description: { type: string, nullable: true }
+            transitionReason: { type: string, nullable: true }
+    PagedIncidents:
+      type: object
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/IncidentSummary" }
+        page: { type: integer }
+        size: { type: integer }
+        totalElements: { type: integer, format: int64 }
+        totalPages: { type: integer }
+      required: [items, page, size, totalElements, totalPages]
   parameters:
     IncidentId:
       name: id

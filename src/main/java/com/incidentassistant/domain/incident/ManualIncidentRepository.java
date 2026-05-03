@@ -1,6 +1,7 @@
 package com.incidentassistant.domain.incident;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,6 +20,13 @@ public interface ManualIncidentRepository {
   Incident insert(Incident incident);
 
   Optional<Incident> findById(UUID id);
+
+  /**
+   * Lists {@link IncidentSource#MANUAL} rows only. When {@code statusesFilter} is non-empty,
+   * restricts to those statuses; when empty, no status restriction.
+   */
+  IncidentPage findManualIncidentsPage(
+      int page, int size, List<IncidentStatus> statusesFilter, boolean sortCreatedAtAscending);
 
   /**
    * Updates title, description, and severity for a manual incident when {@code expectedVersion}

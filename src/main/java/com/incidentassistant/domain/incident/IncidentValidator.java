@@ -1,6 +1,5 @@
 package com.incidentassistant.domain.incident;
 
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -15,7 +14,9 @@ public final class IncidentValidator {
   private IncidentValidator() {}
 
   public static String validateTitle(String rawTitle) {
-    Objects.requireNonNull(rawTitle, "title");
+    if (rawTitle == null) {
+      throw new IncidentValidationException("title is required");
+    }
     String trimmed = rawTitle.trim();
     if (trimmed.length() < TITLE_MIN_LEN || trimmed.length() > TITLE_MAX_LEN) {
       throw new IncidentValidationException(
@@ -41,7 +42,9 @@ public final class IncidentValidator {
   }
 
   public static IncidentSeverity validateSeverity(IncidentSeverity severity) {
-    Objects.requireNonNull(severity, "severity");
+    if (severity == null) {
+      throw new IncidentValidationException("severity is required");
+    }
     return severity;
   }
 
