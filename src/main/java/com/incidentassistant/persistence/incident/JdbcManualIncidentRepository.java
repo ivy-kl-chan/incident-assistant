@@ -10,13 +10,14 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Repository;
 
-@Repository
-@ConditionalOnBean(JdbcTemplate.class)
+/**
+ * JDBC implementation of {@link ManualIncidentRepository}. Registered as a Spring bean from {@link
+ * com.incidentassistant.autoconfigure.IncidentJdbcAutoConfiguration} after {@link JdbcTemplate}
+ * exists.
+ */
 public class JdbcManualIncidentRepository implements ManualIncidentRepository {
 
   private static final RowMapper<Incident> ROW_MAPPER =

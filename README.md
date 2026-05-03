@@ -33,6 +33,41 @@ From the repository root:
 mvn clean verify
 ```
 
+### Running Testcontainers locally (Docker Desktop)
+
+Use this checklist when integration tests are skipped with `disabledWithoutDocker is true and Docker is not available`.
+
+1. Start Docker Desktop and wait until it is fully ready.
+2. Verify the Docker daemon from the same shell you use for Maven:
+
+```bash
+docker context show
+docker info
+```
+
+3. Create `~/.docker-java.properties` with a Docker API compatibility override:
+
+```bash
+cat > ~/.docker-java.properties <<'EOF'
+api.version=1.44
+EOF
+```
+
+4. Run tests from the repository root:
+
+```bash
+mvn verify
+```
+
+5. Confirm Testcontainers actually starts containers by checking logs for lines like:
+   - `Creating container for image: testcontainers/ryuk`
+   - `Creating container for image: postgres:16-alpine`
+
+Notes:
+- If tests still skip, restart Docker Desktop and rerun the same command.
+- `docker ps` can be empty before tests start; containers are created only while Testcontainers tests run.
+- Once containers start correctly, skipped tests should turn into real execution results (pass or fail).
+
 Run the application:
 
 ```bash

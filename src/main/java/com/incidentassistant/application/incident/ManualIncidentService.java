@@ -15,9 +15,6 @@ import com.incidentassistant.domain.incident.ManualIncidentRepository;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.UUID;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Service;
 
 /**
  * Application service for manually created incidents ({@link IncidentSource#MANUAL} only). New rows
@@ -29,9 +26,10 @@ import org.springframework.stereotype.Service;
  *
  * <p><strong>Timestamps:</strong> {@code created_at} and {@code updated_at} are set from {@link
  * Clock} on insert; {@code updated_at} advances on each successful mutation that updates the row.
+ *
+ * <p>Spring registers this type from {@link com.incidentassistant.autoconfigure.IncidentJdbcAutoConfiguration}
+ * once {@link org.springframework.jdbc.core.JdbcTemplate} is available (see class Javadoc there).
  */
-@Service
-@ConditionalOnBean(JdbcTemplate.class)
 public class ManualIncidentService {
 
   static final long INITIAL_VERSION = 1L;
