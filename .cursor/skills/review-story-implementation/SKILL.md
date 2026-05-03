@@ -25,6 +25,7 @@ description: >-
 | **review-story-pre-implementation** | One story quality gate **before coding**. |
 | **review-phase-story-breakdown** | Entire phase story set quality, sequencing, and coverage. |
 | **review-story-implementation** (this) | One story **after implementation**: does code and test evidence match the story and specs? |
+| **implement-story** | Produces the implementation and tests that this skill **reviews**; use after **review-story-pre-implementation** and coding. |
 
 ## Scope
 
@@ -40,7 +41,7 @@ description: >-
 ## Workflow
 
 1. Confirm the **story file path** and **implementation evidence source** (diff/commits/PR scope).
-2. Verify story template compliance with **write-implementation-story** canonical headings and status lifecycle expectations.
+2. Verify story template compliance with **write-implementation-story** canonical numbered headings (`## 1. Status` … `## 15. Completion Notes`) and status lifecycle expectations.
 3. Build a traceability map:
    - **In Scope** -> changed files/code paths.
    - **Acceptance Criteria** -> concrete implementation and tests.

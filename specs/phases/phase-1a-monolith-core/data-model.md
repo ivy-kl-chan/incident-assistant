@@ -19,9 +19,11 @@ The **`V1`** script creates the full row shape below; **1a** code uses only the 
 | `source` | VARCHAR(16) | Default **`MANUAL`**; **1a** never writes **`SIGNAL`** |
 | `created_by_rule_id` | VARCHAR(128) | nullable; **unused** in **1a** |
 | `signal_fingerprint` | VARCHAR(64) | nullable; **unused** in **1a** |
-| `telemetry_context` | JSONB or TEXT | nullable; **unused** in **1a** |
+| `telemetry_context` | JSONB | nullable; **unused** in **1a**; normative DDL uses **JSONB** (see **`V1`** / Flyway baseline) |
 | `created_at` | TIMESTAMPTZ | |
 | `updated_at` | TIMESTAMPTZ | |
+
+**Wire field (not an `incidents` column):** **`transitionReason`** on **`GET /api/v1/incidents/{id}`** per **`api-contract.md`** — **not** persisted in **`V1`**; **1a** implementations return **`null`**.
 
 **Semantics:** Same state meanings as the former combined spec: **no** `OPEN` from `CLOSED` in v1.
 

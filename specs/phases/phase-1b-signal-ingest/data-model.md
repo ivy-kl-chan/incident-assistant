@@ -12,7 +12,7 @@ Physical columns are created in **`V1`** (`../phase-1a-monolith-core/data-model.
 |--------|------|--------|
 | `created_by_rule_id` | VARCHAR(128) | nullable; set when `source=SIGNAL` |
 | `signal_fingerprint` | VARCHAR(64) | nullable; **64** lowercase hex; **no** global `UNIQUE` (Option A) |
-| `telemetry_context` | JSONB or TEXT | nullable; max **8 KiB** stored |
+| `telemetry_context` | JSONB | nullable; max **8 KiB** stored (normative DDL: **JSONB**; **TEXT** only with ADR) |
 
 `source` may be **`SIGNAL`** for signal-created rows.
 
