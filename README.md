@@ -23,8 +23,7 @@ Incident Assistant is a portfolio and learning demo. Ivy Chan owns product direc
 
 - **JDK 21**
 - **Maven** (3.9+ recommended)
-- **Docker** (recommended): integration tests that use **Testcontainers** (PostgreSQL, Flyway migrations) need a Docker daemon. If Docker is not available, those tests may be **skipped** (`@Testcontainers(disabledWithoutDocker = true)`). **`mvn verify`** matches full Phase **1a** coverage when Docker runs locally or in CI.
-  > > > > > > > main
+- **Docker** (recommended): integration tests that use **Testcontainers** (PostgreSQL, Flyway migrations) need a Docker daemon. If Docker is not available, those tests may be **skipped** (`@Testcontainers(disabledWithoutDocker = true)`). **`mvn verify`** matches full Phase **1a** coverage when Docker runs locally or in **[default CI](#continuous-integration)** (GitHub-hosted runners provide Docker, so **`FlywayV1BaselineIntegrationTest`** runs there).
 
 ### Build, run, and test (bare JVM)
 
@@ -127,7 +126,7 @@ Use **`mvn clean verify`** before submitting changes. Follow **`specs/`** and pr
 | **`pull_request`** targeting **`main`** | Runs **`mvn --batch-mode verify`** on **`ubuntu-latest`** with **JDK 21** (Temurin). |
 | **`push`** to **`main`**                | Same job.                                                                            |
 
-Hosted runners provide **Docker**, so **Testcontainers** integration tests **run** there instead of being skipped. Image pulls (for example **`postgres:16-alpine`**) require outbound network access from the runner.
+Hosted runners provide **Docker**, so **Testcontainers** integration tests—including **`FlywayV1BaselineIntegrationTest`** (PostgreSQL + Flyway **`V1`**)—**run** there instead of being skipped. Image pulls (for example **`postgres:16-alpine`**) require outbound network access from the runner.
 
 ## License
 
