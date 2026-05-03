@@ -3,6 +3,7 @@ package com.incidentassistant.testsupport;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -18,10 +19,28 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * <p>{@link DirtiesContext} avoids reusing a cached {@link org.springframework.context.ApplicationContext}
  * whose JDBC URL points at a PostgreSQL instance that Testcontainers has already replaced when
  * multiple {@code @SpringBootTest} subclasses run in one JVM.
+ *
+ * <p>When system property {@value #INCIDENT_ASSISTANT_INTEGRATION_REQUIRE_DOCKER} is {@code true},
+ * loading this class fails if Docker is not available, instead of skipping tests via {@code
+ * disabledWithoutDocker}. CI enables this when a change touches {@code src/main/resources/db/}.
  */
 @Testcontainers(disabledWithoutDocker = true)
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 public abstract class PostgresIntegrationTest {
+
+  /** When {@code true}, integration subclasses fail fast if Docker is unavailable (no silent skip). */
+  public static final String INCIDENT_ASSISTANT_INTEGRATION_REQUIRE_DOCKER =
+      "incident.assistant.integration.requireDocker";
+
+  static {
+    if (Boolean.getBoolean(INCIDENT_ASSISTANT_INTEGRATION_REQUIRE_DOCKER)
+        && !DockerClientFactory.instance().isDockerAvailable()) {
+      throw new IllegalStateException(
+          "System property "
+              + INCIDENT_ASSISTANT_INTEGRATION_REQUIRE_DOCKER
+              + "=true requires Docker for Testcontainers, but Docker is not available.");
+    }
+  }
 
   @Container
   @ServiceConnection

@@ -165,6 +165,8 @@ Use **`mvn clean verify`** before submitting changes. Follow **`specs/`** and pr
 
 Hosted runners provide **Docker**, so **Testcontainers** integration tests—including **`FlywayV1BaselineIntegrationTest`** (PostgreSQL + Flyway **`V1`**)—**run** there instead of being skipped. Image pulls (for example **`postgres:16-alpine`**) require outbound network access from the runner.
 
+If a commit changes files under **`src/main/resources/db/`**, CI runs **`mvn verify -Dincident.assistant.integration.requireDocker=true`**, so Testcontainers-backed tests **fail** if Docker is unavailable instead of being skipped—use the same flag locally when validating migration changes.
+
 ## License
 
 _To be determined by repository owner._
