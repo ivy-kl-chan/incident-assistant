@@ -2,6 +2,7 @@ package com.incidentassistant.application.incident;
 
 import com.incidentassistant.domain.incident.CreateManualIncidentCommand;
 import com.incidentassistant.domain.incident.Incident;
+import com.incidentassistant.domain.incident.IncidentPage;
 import com.incidentassistant.domain.incident.IncidentConflictException;
 import com.incidentassistant.domain.incident.IncidentFieldPatch;
 import com.incidentassistant.domain.incident.IncidentNotFoundException;
@@ -14,6 +15,7 @@ import com.incidentassistant.domain.incident.IncidentValidator;
 import com.incidentassistant.domain.incident.ManualIncidentRepository;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -67,6 +69,29 @@ public class ManualIncidentService {
         now,
         now);
     return manualIncidentRepository.insert(incident);
+  }
+
+  /**
+   * Returns the incident for HTTP GET when it exists and is {@link IncidentSource#MANUAL}; non-manual
+   * rows are treated as absent (same as unknown id for Phase 1a).
+   */
+  public Incident getForApi(UUID id) {
+    Incident incident =
+        manualIncidentRepository.findById(id).orElseThrow(() -> new IncidentNotFoundException(id));
+    if (incident.source() != IncidentSource.MANUAL) {
+      throw new IncidentNotFoundException(id);
+    }
+    return incident;
+  }
+
+  /**
+   * Lists manual incidents with optional status filter (empty list = no status restriction), ordered by
+   * {@code created_at}.
+   */
+  public IncidentPage list(
+      int page, int size, List<IncidentStatus> statusesFilter, boolean sortCreatedAtAscending) {
+    return manualIncidentRepository.findManualIncidentsPage(
+        page, size, statusesFilter, sortCreatedAtAscending);
   }
 
   /**

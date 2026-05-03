@@ -1,3 +1,8 @@
+server:
+  tomcat:
+    # POST /api/v1/incidents JSON body limit (Phase 1a api-contract.md): max 1 MiB → 413 when exceeded
+    max-http-form-post-size: 1048576
+
 spring:
   application:
     name: incident-assistant

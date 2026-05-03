@@ -1,15 +1,18 @@
 package com.incidentassistant.persistence.incident;
 
 import com.incidentassistant.domain.incident.Incident;
+import com.incidentassistant.domain.incident.IncidentPage;
 import com.incidentassistant.domain.incident.IncidentSeverity;
 import com.incidentassistant.domain.incident.IncidentSource;
 import com.incidentassistant.domain.incident.IncidentStatus;
 import com.incidentassistant.domain.incident.ManualIncidentRepository;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -81,6 +84,52 @@ public class JdbcManualIncidentRepository implements ManualIncidentRepository {
       return Optional.empty();
     }
     return Optional.of(rows.getFirst());
+  }
+
+  @Override
+  public IncidentPage findManualIncidentsPage(
+      int page, int size, List<IncidentStatus> statusesFilter, boolean sortCreatedAtAscending) {
+    String order = sortCreatedAtAscending ? "ASC" : "DESC";
+    String baseWhere = "FROM incidents WHERE source = 'MANUAL'";
+    List<Object> countArgs = new ArrayList<>();
+    List<Object> selectArgs = new ArrayList<>();
+    String filterClause = "";
+    if (!statusesFilter.isEmpty()) {
+      filterClause =
+          " AND status IN (" + statusesFilter.stream().map(s -> "?").collect(Collectors.joining(",")) + ")";
+      for (IncidentStatus s : statusesFilter) {
+        countArgs.add(s.name());
+      }
+    }
+
+    Long total =
+        jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) " + baseWhere + filterClause,
+            Long.class,
+            countArgs.toArray());
+    long totalElements = total != null ? total : 0L;
+
+    int offset = page * size;
+    String selectSql =
+        """
+        SELECT id, version, status, title, description, severity, source, created_at, updated_at
+        """
+            + baseWhere
+            + filterClause
+            + " ORDER BY created_at "
+            + order
+            + " LIMIT ? OFFSET ?";
+    if (!statusesFilter.isEmpty()) {
+      for (IncidentStatus s : statusesFilter) {
+        selectArgs.add(s.name());
+      }
+    }
+    selectArgs.add(size);
+    selectArgs.add(offset);
+
+    List<Incident> items =
+        jdbcTemplate.query(selectSql, ROW_MAPPER, selectArgs.toArray());
+    return new IncidentPage(items, totalElements, page, size);
   }
 
   /**

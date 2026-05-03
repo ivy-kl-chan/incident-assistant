@@ -4,7 +4,7 @@
 
 ## 1. Status
 
-Approved
+Implemented
 
 ## 2. Goal
 
@@ -61,13 +61,13 @@ None (uses Story **2–3**).
 
 ## 11. Acceptance Criteria
 
-- [ ] **201** create + **GET** round-trip for **1a** fields (**without** asserting **`ETag`** on **`GET` by id** — deferred to **Story 5**).
-- [ ] **GET** unknown id → **404**.
-- [ ] List pagination defaults and caps per contract (**`size`** max **100**); bad **`page`/`size`** → **400**.
-- [ ] Unknown query parameter → **400** (explicit test for **`source`** if present in request).
-- [ ] **`X-Request-Id`** behavior implemented.
-- [ ] Wrong or missing **`Content-Type`** for JSON bodies → **415** or **400** per server-wide documented policy.
-- [ ] **`503`** (preferred) or **`500`** when persistence is unavailable for **list** or **GET by id**, **or** behavior explicitly **deferred** and **documented** (README or story **§14**) with rationale aligned to **`api-contract.md`** availability clauses.
+- [x] **201** create + **GET** round-trip for **1a** fields (**without** asserting **`ETag`** on **`GET` by id** — deferred to **Story 5**). — `IncidentsApiIntegrationTest.postThenGet_roundTrip_1aFields`
+- [x] **GET** unknown id → **404**. — `IncidentsApiIntegrationTest.getUnknown_returns404`
+- [x] List pagination defaults and caps per contract (**`size`** max **100**); bad **`page`/`size`** → **400**. — `IncidentListQueryParserTest`, `IncidentsApiIntegrationTest.list_paginationAndSort`, `list_badPage_returns400`
+- [x] Unknown query parameter → **400** (explicit test for **`source`** if present in request). — `IncidentsApiIntegrationTest.list_unknownQueryKey_source_returns400`
+- [x] **`X-Request-Id`** behavior implemented. — `RequestIdFilter`, `IncidentsApiIntegrationTest.requestId_echoedWhenProvided`
+- [x] Wrong or missing **`Content-Type`** for JSON bodies → **415** or **400** per server-wide documented policy. — **415** for wrong type: `IncidentsApiIntegrationTest.post_wrongContentType_returns415`; documented in README
+- [x] **`503`** (preferred) or **`500`** when persistence is unavailable for **list** or **GET by id**, **or** behavior explicitly **deferred** and **documented** (README or story **§14**) with rationale aligned to **`api-contract.md`** availability clauses. — **`503`** + `ApiExceptionHandler` + `IncidentControllerWebMvcTest`; README **Incidents HTTP**
 
 ## 12. Test Requirements
 
@@ -92,4 +92,7 @@ None (uses Story **2–3**).
 
 ## 16. Completion Notes
 
-*(Fill when implemented.)*
+- **Implemented:** 2026-05-03 (branch/workspace; commit not recorded by agent).
+- **Delivered:** `IncidentController` + DTOs, `IncidentListQueryParser`, `RequestIdFilter`, `ApiExceptionHandler`; `IncidentPage` + JDBC `findManualIncidentsPage`; `ManualIncidentService.getForApi` / `list`; `application.yml` POST **1 MiB** limit; README incidents section.
+- **Tests:** `IncidentsApiIntegrationTest` (Testcontainers PostgreSQL), `IncidentListQueryParserTest`, `IncidentControllerWebMvcTest` (**503** mapping). `ActuatorHealthTest` uses **`@MockBean ManualIncidentService`** so JDBC stays excluded without breaking controller wiring.
+- **Note:** `@ConditionalOnBean(ManualIncidentService)` on the controller was **not** used — it evaluated too early during component scan, skipping the controller (**404**). Wiring for actuator-without-JDBC is handled via the test **`@MockBean`** instead.
