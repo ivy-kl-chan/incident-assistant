@@ -4,7 +4,7 @@
 
 ## 1. Status
 
-Implemented
+Complete
 
 ## 2. Goal
 
@@ -87,12 +87,13 @@ None (uses Story **2–3**).
 
 ## 15. Human Review Checklist
 
-- [ ] Response JSON matches **1a** shapes (no **1b** fields).
-- [ ] List filter semantics match **1a** (manual-only).
+- [x] Response JSON matches **1a** shapes (no **1b** fields).
+- [x] List filter semantics match **1a** (manual-only).
 
 ## 16. Completion Notes
 
 - **Implemented:** 2026-05-03 (branch/workspace; commit not recorded by agent).
+- **Marked complete:** 2026-05-03 — `## 1. Status` set to **Complete**; human review checklist satisfied.
 - **Delivered:** `IncidentController` + DTOs, `IncidentListQueryParser`, `RequestIdFilter`, `ApiExceptionHandler`; `IncidentPage` + JDBC `findManualIncidentsPage`; `ManualIncidentService.getForApi` / `list`; `application.yml` POST **1 MiB** limit; README incidents section.
 - **Tests:** `IncidentsApiIntegrationTest` (Testcontainers PostgreSQL), `IncidentListQueryParserTest`, `IncidentControllerWebMvcTest` (**503** mapping). `ActuatorHealthTest` uses **`@MockBean ManualIncidentService`** so JDBC stays excluded without breaking controller wiring.
 - **Note:** `@ConditionalOnBean(ManualIncidentService)` on the controller was **not** used — it evaluated too early during component scan, skipping the controller (**404**). Wiring for actuator-without-JDBC is handled via the test **`@MockBean`** instead.
