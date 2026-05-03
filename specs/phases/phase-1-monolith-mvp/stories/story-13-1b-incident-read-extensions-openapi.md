@@ -26,7 +26,11 @@ Clients can filter mixed manual/signal inventories and inspect **telemetry** met
 | [`../../phase-1b-signal-ingest/test-plan.md`](../../phase-1b-signal-ingest/test-plan.md) | List **`source`** tests; **GET** detail optional fields |
 | [`../../../03-acceptance-criteria.md`](../../../03-acceptance-criteria.md) | **1b** DoD: **`openapi-1b.yaml`**; list default **MANUAL**; **`source=ALL`** |
 
-## 5. In Scope
+## 5. Prerequisites, dependencies, and blocked by
+
+- **[Story 11](story-11-1b-signal-ingest-http-evaluations.md)** (and typically **[Story 12](story-12-1b-ingest-idempotency-and-audit.md)** for a complete **1b** ingest path) — read extensions and **`openapi-1b.yaml`** build on list/get and signal-backed rows.
+
+## 6. In Scope
 
 - **`GET /api/v1/incidents`**: optional **`source`** query (**`MANUAL`**, **`SIGNAL`**, **`ALL`**); **omitted** → **MANUAL** rows only; invalid/duplicate/empty/comma-separated → **400**.
 - **`GET /api/v1/incidents/{id}`**: include **`telemetryContext`**, **`createdByRuleId`**, **`signalFingerprint`** when present; **`null`/omitted** for pure manual rows per contract.
@@ -34,25 +38,25 @@ Clients can filter mixed manual/signal inventories and inspect **telemetry** met
 - **`specs/openapi/openapi-1b.yaml`**: ingest + extended list/get; align with implemented controllers.
 - README updates: **1b** API usage examples (**curl**), **`SIGNAL_INGEST_TOKEN`**, **`signals.enabled`** (full stack walkthrough lives in **Story 15**).
 
-## 6. Out of Scope
+## 7. Out of Scope
 
 - **`POST/PATCH`** incident changes for signal fields (not in **1b** contract as automatic—manual patch rules remain **1a**).
 - **New** ingest routes beyond evaluations.
 - **AI**, **RAG**, **MCP**, **Kubernetes**, **microservices**, end-to-end **demo stack** runbooks (**Story 15**).
 
-## 7. API Changes
+## 8. API Changes
 
 - **Extend:** `GET /api/v1/incidents`, `GET /api/v1/incidents/{id}` per **1b** `api-contract.md`.
 
-## 8. Data Model Changes
+## 9. Data Model Changes
 
 None (read-only mapping to existing columns).
 
-## 9. Business Rules
+## 10. Business Rules
 
 - **Security:** **`deepLinks`** treated as untrusted display URLs; no secrets embedded (**1b** `api-contract.md`).
 
-## 10. Acceptance Criteria
+## 11. Acceptance Criteria
 
 - [ ] **Omitted** **`source`** returns only **`MANUAL`** rows even when **`SIGNAL`** rows exist in DB.
 - [ ] **`source=ALL`** returns mixed; **`source=SIGNAL`** only signal rows; **`source=MANUAL`** same as omitted.
@@ -60,24 +64,24 @@ None (read-only mapping to existing columns).
 - [ ] Detail **GET** shows extended fields for **`SIGNAL`** rows created in Story **11** fixtures.
 - [ ] **`openapi-1b.yaml`** matches live behavior for listed paths and merges cleanly with **1a** OpenAPI per repo **`openapi/README.md`**.
 
-## 11. Test Requirements
+## 12. Test Requirements
 
 - Integration tests from **1b** `test-plan.md` for list/detail extensions.
 - Optional contract check: diff OpenAPI vs controller annotations if tooling exists.
 
-## 12. Files Expected to Change
+## 13. Files Expected to Change
 
 - **`src/main/java/**`** list/get controllers/DTO mappers; **`specs/openapi/openapi-1b.yaml`**; **`src/test/java/**`**; **`README.md`** (API examples only).
 
-## 13. Implementation Notes
+## 14. Implementation Notes
 
 - Ensure **OpenAPI** documents **`Idempotency-Key`** and **ingest** schemas added in Stories **11–12** if not already mirrored.
 
-## 14. Human Review Checklist
+## 15. Human Review Checklist
 
 - [ ] Default list behavior preserves **1a** expectations (manual-only when **`source`** omitted).
 - [ ] OpenAPI merge story is clear for consumers.
 
-## 15. Completion Notes
+## 16. Completion Notes
 
 *(Fill when implemented.)*

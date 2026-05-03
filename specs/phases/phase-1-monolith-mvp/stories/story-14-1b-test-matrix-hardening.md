@@ -23,53 +23,57 @@ Ingest and read paths behave predictably under failure and strict validation—r
 | [`../../phase-1b-signal-ingest/implementation-plan.md`](../../phase-1b-signal-ingest/implementation-plan.md) | **B6** **1b** gate |
 | [`../../../03-acceptance-criteria.md`](../../../03-acceptance-criteria.md) | Phase **1b** tests bullet list |
 
-## 5. In Scope
+## 5. Prerequisites, dependencies, and blocked by
+
+- **Stories [11](story-11-1b-signal-ingest-http-evaluations.md)–[13](story-13-1b-incident-read-extensions-openapi.md)** — primary **1b** HTTP surfaces so the test matrix can target real controllers and contracts.
+
+## 6. In Scope
 
 - Automated tests proving **500** path when a rule evaluator throws (test double / stub implementation).
 - Automated tests for **422** (or **400** where contract allows) on **`observedAt`** window violations and oversized/too-deep **`fingerprintInputs`** / **`telemetryPointers`** per **`api-contract.md`**.
 - Document **429**: if not implemented, state “not implemented” in README/OpenAPI; if implemented, add tests per **`test-plan.md`**.
 - Audit Stories **11–13** for any **test-plan.md** row still missing and add targeted tests.
 
-## 6. Out of Scope
+## 7. Out of Scope
 
 - New product features or rule ids.
 - **Docker**, **OpenTelemetry Demo**, **Kubernetes**, **microservices**, **AI**, **RAG**, **MCP**.
 
-## 7. API Changes
+## 8. API Changes
 
 None unless **429** is newly implemented (then document in OpenAPI/README).
 
-## 8. Data Model Changes
+## 9. Data Model Changes
 
 None.
 
-## 9. Business Rules
+## 10. Business Rules
 
 - **500** responses must not include stack traces in JSON bodies (**RFC 7807** alignment with **1a** error style where applicable).
 
-## 10. Acceptance Criteria
+## 11. Acceptance Criteria
 
 - [ ] **test-plan.md** **Integration** and **Unit** sections for **1b** are satisfied by automated tests in default CI (**PostgreSQL** via Testcontainers).
 - [ ] **500** rule-throw path covered.
 - [ ] **422**/validation paths for clock and nested JSON limits covered.
 - [ ] **429** behavior explicitly documented; tests exist **if** feature exists.
 
-## 11. Test Requirements
+## 12. Test Requirements
 
 - JUnit / Spring tests only; no new external services.
 
-## 12. Files Expected to Change
+## 13. Files Expected to Change
 
 - **`src/test/java/**`** primarily; small README/OpenAPI notes if **429** stance changes.
 
-## 13. Implementation Notes
+## 14. Implementation Notes
 
 - Prefer test doubles over changing production rule implementations.
 
-## 14. Human Review Checklist
+## 15. Human Review Checklist
 
 - [ ] No skipped **test-plan.md** rows without explicit issue link (per portfolio rules for deferrals).
 
-## 15. Completion Notes
+## 16. Completion Notes
 
 *(Fill when implemented.)*

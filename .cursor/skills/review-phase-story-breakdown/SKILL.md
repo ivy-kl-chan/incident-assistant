@@ -34,7 +34,7 @@ description: >-
 
 1. Confirm **phase id** and list **all** `story-*.md` files and **all** phase spec files you read.
 2. Skim `02-roadmap.md` and `03-acceptance-criteria.md` for the intended **phase boundary** and **definition of done**.
-3. For each story file, check template completeness against **write-implementation-story**: all **fifteen** canonical numbered sections (**`## 1. Status`** through **`## 15. Completion Notes`**) present **in order**, with exact titles—no omissions, no extra `##` story sections, no renames.
+3. For each **non-frozen** story file (`**## 1. Status`** not **`Complete`** or **`Completed`**; see **Closed story files** in `.cursor/rules/incident-assistant-project.mdc`), check template completeness against **write-implementation-story**: all **sixteen** canonical numbered sections (**`## 1. Status`** through **`## 16. Completion Notes`**, including **`## 5. Prerequisites, dependencies, and blocked by`**) present **in order**, with exact titles—no omissions, no extra `##` story sections, no renames. List frozen **`story-*.md`** files skipped under **Scope** with reason (**artifact closed**).
 4. Apply the **ten evaluation questions** below across the **whole story set** (not only per file): coverage and ordering are **set-level** concerns.
 5. Produce the **required output** sections in order. End with **questions for human approval** where product or architecture choices block unambiguous advice.
 
@@ -45,7 +45,7 @@ Answer each for the **story set as a whole**, with per-story examples where usef
 1. **Are the stories small enough?** Prefer PR-sized, reviewable slices; flag stories that bundle multiple vertical slices, unrelated endpoints, or schema + behavior + docs in one lump without a seam.
 2. **Is each story independently testable?** Can acceptance criteria be verified without implementing a **later** story? Flag coupling to unpublished APIs, missing test seams (interfaces/fakes), or “manual only” verification.
 3. **Does each story have clear scope?** **In Scope** vs **Out of Scope** should be concrete; vague bullets (“improve resilience”) need sharpening.
-4. **Are there hidden dependencies?** Order, data prerequisites, feature flags, migrations, or shared files touched by multiple stories; dependencies should appear in **Implementation Notes** or an explicit note—flag implicit ones.
+4. **Are there hidden dependencies?** Order, data prerequisites, feature flags, migrations, or shared files touched by multiple stories; dependencies should appear in **`## 5. Prerequisites, dependencies, and blocked by`** (optionally elaborated in **Implementation Notes**)—flag implicit ones or empty **§5** when other sections imply sequencing.
 5. **Are any stories too broad?** Single story spanning multiple unrelated user outcomes or entire subsystems; recommend splits with clear boundaries.
 6. **Are any acceptance criteria vague?** Non-measurable adjectives (“fast,” “robust,” “good UX”); missing error/empty states; criteria that cannot map to a test or observable outcome.
 7. **Are test requirements strong enough?** Checkboxes present but **substance** weak (e.g. “add tests” without type/level); alignment with `test-plan.md` and **03-acceptance-criteria.md**; missing integration/contract boundaries when the story exposes HTTP or persistence.
@@ -55,7 +55,7 @@ Answer each for the **story set as a whole**, with per-story examples where usef
 
 ## Alignment with authoring skills
 
-- Story files are expected to follow **write-implementation-story** (fifteen numbered **Canonical section headings** in order, plus the checklist blocks defined there).
+- Story files are expected to follow **write-implementation-story** (sixteen numbered **Canonical section headings** in order, plus the checklist blocks defined there).
 - **decompose-phase-stories** defines where stories live and independence/traceability expectations; this review **validates** that breakdown against specs—does not replace it.
 
 ## Required output

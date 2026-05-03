@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -26,5 +28,40 @@ jobs:
           java-version: "21"
           cache: maven
 
+      - name: Detect changes under src/main/resources/db/
+        id: db_paths
+        shell: bash
+        run: |
+          set -euo pipefail
+          touched=false
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base="${{ github.event.pull_request.base.sha }}"
+            if git diff --name-only "${base}...HEAD" | grep -qE '^src/main/resources/db/'; then
+              touched=true
+            fi
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            before="${{ github.event.before }}"
+            after="${{ github.event.after }}"
+            if [ "$before" = "0000000000000000000000000000000000000000" ]; then
+              if git show --name-only --pretty=format: "$after" | grep -qE '^src/main/resources/db/'; then
+                touched=true
+              fi
+            else
+              if git diff --name-only "$before" "$after" | grep -qE '^src/main/resources/db/'; then
+                touched=true
+              fi
+            fi
+          fi
+          echo "touched=$touched" >> "$GITHUB_OUTPUT"
+          echo "src/main/resources/db/ touched=$touched"
+
       - name: Maven verify
-        run: mvn --batch-mode verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ steps.db_paths.outputs.touched }}" = "true" ]; then
+            echo "DB resources changed: requiring Docker for Testcontainers (no silent skip)"
+            mvn --batch-mode verify -Dincident.assistant.integration.requireDocker=true
+          else
+            mvn --batch-mode verify
+          fi

@@ -24,47 +24,51 @@ When implemented, **Journey A** can demonstrate **log**-grounded abnormality det
 | [`../../phase-1b-signal-ingest/api-contract.md`](../../phase-1b-signal-ingest/api-contract.md) | Validation limits for nested telemetry |
 | [`../README.md`](../README.md) | **Stories** index |
 
-## 5. In Scope
+## 5. Prerequisites, dependencies, and blocked by
+
+- **Placeholders split from [Story 16](story-16-1b-traces-telemetry-placeholder.md)** per **§7**; full **1b** core (**Stories 10+**) should be stable before activation.
+
+## 6. In Scope
 
 - None until this placeholder is promoted to an active story.
 
-## 6. Out of Scope
+## 7. Out of Scope
 
 - Implementation while this file remains a placeholder.
 - **1b-T** scope (**Story 16**).
 
-## 7. API Changes
+## 8. API Changes
 
 Deferred—define when story is activated.
 
-## 8. Data Model Changes
+## 9. Data Model Changes
 
 None as placeholder.
 
-## 9. Business Rules
+## 10. Business Rules
 
 - Must not regress **1b-M**/**1b-T** ingest or read contracts.
 
-## 10. Acceptance Criteria
+## 11. Acceptance Criteria
 
 - [ ] *(When activated)* **`implementation-plan.md`** **1b-L** row satisfied with tests + README updates (or explicit deferral with issue link).
 
-## 11. Test Requirements
+## 12. Test Requirements
 
 - [ ] *(When activated)* Tests per **`phase-1b-signal-ingest/test-plan.md`** additions for log-centric fixtures.
 
-## 12. Files Expected to Change
+## 13. Files Expected to Change
 
 - *(When activated)* Rules, **`README.md`**, tests, optional OpenAPI examples.
 
-## 13. Implementation Notes
+## 14. Implementation Notes
 
 - **Depends on:** Story **16** unless ADR documents parallel **1b-T**/**1b-L** delivery.
 
-## 14. Human Review Checklist
+## 15. Human Review Checklist
 
 - [ ] Placeholder removed from title before implementation starts.
 
-## 15. Completion Notes
+## 16. Completion Notes
 
 *(Placeholder — fill when story is activated or cancelled.)*

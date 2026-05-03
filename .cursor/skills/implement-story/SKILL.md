@@ -28,7 +28,7 @@ description: >-
 
 | Skill | Focus |
 |-------|--------|
-| **write-implementation-story** | Author or normalize **one** story file (template, fifteen sections); **no** application code. |
+| **write-implementation-story** | Author or normalize **one** story file (template, sixteen sections); **no** application code. |
 | **decompose-phase-stories** | Split a **phase** into many `story-*.md` files; planning-only. |
 | **review-phase-story-breakdown** | Quality of the **whole** `stories/` set (ordering, independence). |
 | **review-story-pre-implementation** | **Go/no-go** on the story **before** coding (traceability, risk, invariants). |
@@ -38,10 +38,11 @@ description: >-
 ## Preconditions (do not skip)
 
 1. **Normative specs exist** for the behavior being built (project rule: no implementation before spec).
-2. The phase is decomposed into stories (**decompose-phase-stories** / **write-implementation-story**); the target file follows **write-implementation-story** canonical headings (`## 1. Status` … `## 15. Completion Notes`).
+2. The phase is decomposed into stories (**decompose-phase-stories** / **write-implementation-story**); the target file follows **write-implementation-story** canonical headings (`## 1. Status` … `## 16. Completion Notes`).
 3. **Single active story:** confirm which `story-*.md` is in scope; do not implement multiple stories in one pass.
-4. **Status gate:** **`## 1. Status`** should be **`Approved`** before coding. If it is `Draft` or `Planned`, stop unless the user explicitly waives the gate (same convention as **review-story-pre-implementation**).
-5. Read the story in full and every artifact under **Spec References** (`spec.md`, `api-contract.md`, `data-model.md`, `test-plan.md`, `specs/03-acceptance-criteria.md` as cited).
+4. **Status gate:** **`## 1. Status`** should be **`Approved`** before coding. If it is `Draft` or `Planned`, stop unless the user explicitly waives the gate (same convention as **review-story-pre-implementation**). If it is **`Complete`** or **`Completed`**, **stop**—the story artifact is **closed**; do not implement or “refresh” the file unless the user explicitly requests a **doc-only** change to that file (see **Closed story files** in `.cursor/rules/incident-assistant-project.mdc`).
+5. **Prerequisite codebase alignment:** For each prior story in **`## 5. Prerequisites, dependencies, and blocked by`**, confirm its deliverables exist in the **current branch/working tree** (types, migrations, wiring, APIs this story imports or builds on)—not only that the prerequisite **`## 1. Status`** looks done. If the baseline is wrong (unmerged prerequisite work, wrong branch, partial cherry-pick), **stop** and reconcile git history before coding.
+6. Read the story in full and every artifact under **Spec References** (`spec.md`, `api-contract.md`, `data-model.md`, `test-plan.md`, `specs/03-acceptance-criteria.md` as cited).
 
 Optional but recommended: user has run or accepts **review-story-pre-implementation** on this story before **`Approved`**.
 
@@ -72,12 +73,12 @@ Enforce `.cursor/rules/incident-assistant-project.mdc` while coding:
 
 Provide **after** implementation (matches project rules **After coding, always provide**):
 
-- **Story status update:** set **`## 1. Status`** to **`Implemented`** when the scoped deliverable is merged or ready for review; fill **`## 15. Completion Notes`** with dates, PR/commit refs, and deviations (if any). Do **not** set **`Complete`** unless the user explicitly marks human verification done—**`Complete`** is human-only after checks pass (see **review-story-implementation**).
+- **Story status update:** set **`## 1. Status`** to **`Implemented`** when the scoped deliverable is merged or ready for review; fill **`## 16. Completion Notes`** with dates, PR/commit refs, and deviations (if any). Do **not** set **`Complete`** unless the user explicitly marks human verification done—**`Complete`** is human-only after checks pass (see **review-story-implementation**).
 - **What changed:** file-scoped summary linked to acceptance criteria.
 - **Tests added:** locations and what they prove.
 - **Commands to run:** e.g. `./mvnw test`, integration commands per README/test-plan.
 - **Known limitations:** honest gaps or follow-ups **outside** this story’s scope.
-- **Acceptance criteria:** confirm each **## 10. Acceptance Criteria** item with evidence (code/test/behavior).
+- **Acceptance criteria:** confirm each **## 11. Acceptance Criteria** item with evidence (code/test/behavior).
 - **Phase acceptance:** note whether phase-level criteria apply **if** this story finishes the phase.
 
 ## Workflow checklist
@@ -85,12 +86,12 @@ Provide **after** implementation (matches project rules **After coding, always p
 Copy and track:
 
 ```
-- [ ] Preconditions satisfied (specs, single Approved story, spec refs read)
+- [ ] Preconditions satisfied (specs, single Approved story, §5 prerequisites present in codebase, spec refs read)
 - [ ] Before-coding block delivered in chat
 - [ ] Status → In Progress when coding starts
 - [ ] Code + tests scoped to story; invariants enforced
-- [ ] Story §10 / §11 satisfied with evidence
-- [ ] After-coding block delivered; Status → Implemented; §15 Completion Notes updated
+- [ ] Story §11 / §12 satisfied with evidence
+- [ ] After-coding block delivered; Status → Implemented; §16 Completion Notes updated
 - [ ] Offer or run review-story-implementation when user wants post-implementation gate
 ```
 

@@ -23,7 +23,11 @@ Safe retries from webhook clients do not create duplicate incidents; operators c
 | [`../../phase-1b-signal-ingest/test-plan.md`](../../phase-1b-signal-ingest/test-plan.md) | **409** conflict; replay same key+body; replay still requires token |
 | [`../../../03-acceptance-criteria.md`](../../../03-acceptance-criteria.md) | Phase **1b** DoD: idempotency behavior |
 
-## 5. In Scope
+## 5. Prerequisites, dependencies, and blocked by
+
+- **[Story 11](story-11-1b-signal-ingest-http-evaluations.md)** — transactional ingest and dedup matrix before idempotency header and audit hardening.
+
+## 6. In Scope
 
 - Header **`Idempotency-Key`** optional; pattern and max length per **`api-contract.md`**.
 - **`body_hash`**, **`key_hash`** computation and lookup **before** rule evaluation / mutations as ordered in **`data-model.md`** “Request handling order”.
@@ -33,51 +37,51 @@ Safe retries from webhook clients do not create duplicate incidents; operators c
 - **`INGEST_IDEMPOTENCY_TTL`** default **24h** (configurable); lazy expiry acceptable.
 - Optional **`signal_ingest_audit`**: store **`payload_hash`**, **`matched`**, **`dedup_hit`**, **`incident_id`**, timestamps—if implemented, document fields.
 
-## 6. Out of Scope
+## 7. Out of Scope
 
 - Changing **dedup** matrix (**Story 11**).
 - **`GET`** incident extensions (**Story 13**).
 - **Rate limiting** (**429**) unless team pulls it in here—default **out** unless spec mandates “if implemented”.
 - **Docker**, **OpenTelemetry Demo**, **Kubernetes**, **microservices**, **AI**, **RAG**, **MCP**.
 
-## 7. API Changes
+## 8. API Changes
 
 - **Extend:** `POST /api/v1/signal-ingest/evaluations` to honor **`Idempotency-Key`** per contract.
 
-## 8. Data Model Changes
+## 9. Data Model Changes
 
 None if **V1** already created **`signal_ingest_idempotency`** / audit tables; otherwise amend **Flyway** with team decision (**ADR** if **V2**—prefer **V1** completeness from Story **2**).
 
-## 9. Business Rules
+## 10. Business Rules
 
 - Do **not** cache **401**/**404**/**409**/**5xx** per **`api-contract.md`**.
 - **Replay** must still validate token and feature flag.
 
-## 10. Acceptance Criteria
+## 11. Acceptance Criteria
 
 - [ ] Same **`Idempotency-Key`** + same body → identical **200**/**201** response without duplicate side effects on incidents/dedup.
 - [ ] Same key + different body (within TTL) → **409**.
 - [ ] Replay with invalid token → **401** even if cached success exists.
 - [ ] Replay with **`signals.enabled=false`** → **404** (not cached success body).
 
-## 11. Test Requirements
+## 12. Test Requirements
 
 - Integration tests per **1b** `test-plan.md` idempotency section.
 - Unit test for canonical JSON hashing stability (sorted keys at all nesting levels).
 
-## 12. Files Expected to Change
+## 13. Files Expected to Change
 
 - **`src/main/java/**`** ingest pipeline ordering, idempotency repository; **`src/test/java/**`**; **`application*.yml`** TTL.
 
-## 13. Implementation Notes
+## 14. Implementation Notes
 
 - Ordering must match **`api-contract.md`** / **`data-model.md`**: auth and flag before returning cached success.
 
-## 14. Human Review Checklist
+## 15. Human Review Checklist
 
 - [ ] **TTL** and cleanup strategy documented.
 - [ ] Audit hashing approach avoids storing sensitive payloads.
 
-## 15. Completion Notes
+## 16. Completion Notes
 
 *(Fill when implemented.)*

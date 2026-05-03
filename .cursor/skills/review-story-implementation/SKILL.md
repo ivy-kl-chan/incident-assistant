@@ -34,6 +34,7 @@ description: >-
    - Files actually changed for that story (working tree diff, commit range, or PR diff as provided by user context).
    - Story **Spec References** artifacts (`spec.md`, `api-contract.md`, `data-model.md`, `test-plan.md`, etc.).
    - Relevant tests and test outputs for this story.
+   - **Surefire evidence (Maven)**: when test outcomes matter for the verdict, read the relevant files under `target/surefire-reports/` (especially `TEST-<FullyQualifiedTestClass>.xml`). Do not rely only on a verbal “tests passed” summary—inspect Surefire XML for failures, skipped tests, errors, and per-test timing when judging test strength or flaky behavior.
 2. **Cross-phase check**: read `specs/02-roadmap.md` or later phases only to flag future-phase creep.
 3. **If story path is missing**: ask which single `story-*.md` to review.
 4. **If implementation evidence is missing** (no diff/commit/PR/test result available): return **No-go** and list the minimum required artifacts before review can proceed.
@@ -41,20 +42,21 @@ description: >-
 ## Workflow
 
 1. Confirm the **story file path** and **implementation evidence source** (diff/commits/PR scope).
-2. Verify story template compliance with **write-implementation-story** canonical numbered headings (`## 1. Status` … `## 15. Completion Notes`) and status lifecycle expectations.
+2. Verify story template compliance with **write-implementation-story** canonical numbered headings (`## 1. Status` … `## 16. Completion Notes`) and status lifecycle expectations—**unless** the story file predates the sixteen-section template and is **`Complete`** / **`Completed`**: then do not require renumbering or **§5** as a **blocker**; note template drift as **optional** follow-up only (see **Closed story files** in `.cursor/rules/incident-assistant-project.mdc`).
 3. Build a traceability map:
    - **In Scope** -> changed files/code paths.
    - **Acceptance Criteria** -> concrete implementation and tests.
    - **Out of Scope** -> verify no accidental implementation.
-4. Run the review lenses below and classify findings by severity.
-5. Return required output sections in order, ending with **go/no-go for story completion status**.
-6. Treat `Complete` as a **human-only** status decision after PR checks pass and code is merged.
+4. When story completion depends on tests: confirm evidence from **Surefire** (`target/surefire-reports/TEST-*.xml` for classes touched by the story) matches claimed outcomes; note any discrepancy between IDE/console output and Surefire reports.
+5. Run the review lenses below and classify findings by severity.
+6. Return required output sections in order, ending with **go/no-go for story completion status**.
+7. Treat `Complete` as a **human-only** status decision after PR checks pass and code is merged.
 
 ## Review lenses (post-implementation, single story)
 
 1. **Scope fidelity**: implemented behavior matches **In Scope**; no hidden expansions.
 2. **Acceptance evidence**: each acceptance criterion is demonstrably satisfied (code + tests + observable behavior).
-3. **Test strength**: tests are meaningful, deterministic, and aligned to `Test Requirements`; mocks/fakes and seam usage obey project rules.
+3. **Test strength**: tests are meaningful, deterministic, and aligned to `Test Requirements`; mocks/fakes and seam usage obey project rules. For Maven, ground conclusions in `target/surefire-reports/TEST-*.xml` (failures, skips, stack traces) when available—not only source reads or summarized pass/fail.
 4. **API and contract compliance**: HTTP behavior and error model align with `api-contract.md` (if applicable).
 5. **Data integrity**: schema, constraints, and persistence behavior align with `data-model.md` and migration intent.
 6. **Architecture boundaries**: monolith-first boundaries respected; externals behind interfaces; no premature microservice coupling.
@@ -75,7 +77,7 @@ Use these markdown headings in order:
 
 ### Scope
 
-Story path, implementation evidence examined, spec files read, and test evidence reviewed.
+Story path, implementation evidence examined, spec files read, and test evidence reviewed (including **Surefire** `target/surefire-reports/` when the story’s tests were executed via Maven).
 
 ### Verdict
 

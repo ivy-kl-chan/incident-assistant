@@ -152,6 +152,8 @@ Blocking and recommended questions from the **Summary** below are **answered**. 
 
 Use **`mvn clean verify`** before submitting changes. Follow **`specs/`** and project rules in **`.cursor/rules/`** (Cursor optional). Feature work should match the active phase story and acceptance criteria.
 
+**Cursor agents:** skill workflow order (happy path and branches) is defined only in **[`.cursor/skills/README.md`](.cursor/skills/README.md)**.
+
 ## Continuous integration
 
 **GitHub Actions** is the default CI host. Workflow: **[`.github/workflows/ci.yml`](.github/workflows/ci.yml)**.
@@ -162,6 +164,8 @@ Use **`mvn clean verify`** before submitting changes. Follow **`specs/`** and pr
 | **`push`** to **`main`**                | Same job.                                                                            |
 
 Hosted runners provide **Docker**, so **Testcontainers** integration tests—including **`FlywayV1BaselineIntegrationTest`** (PostgreSQL + Flyway **`V1`**)—**run** there instead of being skipped. Image pulls (for example **`postgres:16-alpine`**) require outbound network access from the runner.
+
+If a commit changes files under **`src/main/resources/db/`**, CI runs **`mvn verify -Dincident.assistant.integration.requireDocker=true`**, so Testcontainers-backed tests **fail** if Docker is unavailable instead of being skipped—use the same flag locally when validating migration changes.
 
 ## License
 
