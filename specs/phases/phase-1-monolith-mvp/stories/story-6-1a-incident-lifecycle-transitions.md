@@ -12,13 +12,14 @@ Implement **`POST /api/v1/incidents/{id}/transitions`** with **`If-Match`**, val
 
 ## 3. User Value
 
-Operators can promote a draft to open, close an incident, or cancel from draft or open states with an auditable optional reason.
+Operators can promote a draft to open, close an incident, or cancel from draft or open states; optional **`reason`** on the request is validated per **`api-contract.md`** (**1a** does **not** persist **`transitionReason`** on **`GET`**—always **`null`**).
 
 ## 4. Spec References
 
 | Document | Relevance |
 |----------|-----------|
-| [`../../phase-1a-monolith-core/api-contract.md`](../../phase-1a-monolith-core/api-contract.md) | Transitions body, allowed **`to`** values, errors **400/404/409/412** |
+| [`../../phase-1a-monolith-core/api-contract.md`](../../phase-1a-monolith-core/api-contract.md) | Transitions body, allowed **`to`** values, errors **400/404/409/412**; **`transitionReason`** on **`GET`** (**1a**: **`null`**) |
+| [`../../phase-1a-monolith-core/data-model.md`](../../phase-1a-monolith-core/data-model.md) | **`transitionReason`** not an **`incidents`** column in **`V1`** |
 | [`../../phase-1a-monolith-core/spec.md`](../../phase-1a-monolith-core/spec.md) | Canonical state machine |
 | [`../../phase-1a-monolith-core/test-plan.md`](../../phase-1a-monolith-core/test-plan.md) | Transition matrix unit tests; **412** on transitions |
 
@@ -28,7 +29,7 @@ Operators can promote a draft to open, close an incident, or cancel from draft o
 - Body: **`{ "to": "OPEN" | "CLOSED" | "CANCELLED", "reason"?: string ≤500 }`**.
 - Allowed transitions: **`DRAFT`→`OPEN`/`CANCELLED`**; **`OPEN`→`CLOSED`/`CANCELLED`**; none from **`CLOSED`/`CANCELLED`**.
 - **404** if id missing; **409** if transition illegal from current status; **412** if **`If-Match`** stale; **400** for bad JSON, wrong enum, missing **`to`**, **`reason`** too long.
-- Persist **`transitionReason`** (or equivalent “last transition reason”) on **`Incident`** read model per **1a** contract.
+- **`transitionReason`** on **`GET /api/v1/incidents/{id}`** remains **`null`** in **1a** (**not** persisted on **`incidents`** per **`../../phase-1a-monolith-core/api-contract.md`** and **`../../phase-1a-monolith-core/data-model.md`**). Validate optional body **`reason`** (length, presence rules) only; no schema column for it in **1a**.
 
 ## 6. Out of Scope
 
@@ -42,7 +43,7 @@ Operators can promote a draft to open, close an incident, or cancel from draft o
 
 ## 8. Data Model Changes
 
-Optional column for last transition reason if not already in **V1**—should be covered by **1a** `Incident` **`transitionReason`** (verify **V1** DDL vs contract; adjust Story **2** if discovery shows gap—human gate).
+**None** for **1a**: **`transitionReason`** is a **wire-only** field on **`Incident`** responses; **`1a`** always returns **`null`**. A future schema/API change may add persistence; until then, no **`V1`**/`Story 2` DDL change for this field.
 
 ## 9. Business Rules
 
@@ -54,6 +55,7 @@ Optional column for last transition reason if not already in **V1**—should be 
 - [ ] Each allowed transition returns success with updated **`status`**, **`version`**, **`ETag`**, and timestamps consistent with persistence.
 - [ ] Illegal transition → **409**; unknown id → **404**; stale **`If-Match`** → **412**; malformed body → **400**.
 - [ ] **`reason`** optional; length validation enforced.
+- [ ] **`GET`** after a successful transition still returns **`transitionReason`: `null`** (**1a** contract — not stored).
 
 ## 11. Test Requirements
 
@@ -66,12 +68,13 @@ Optional column for last transition reason if not already in **V1**—should be 
 
 ## 13. Implementation Notes
 
-- If **`transitionReason`** is missing from **V1**, amend Story **2** DDL before merging this story (schema correction is not “new feature migration” if done before first release).
+- Do **not** add an **`incidents`** column for **`transitionReason`** in **1a**; align **`GET`** payloads with **`api-contract.md`**. Logging or audit of **`reason`** at the application layer is optional and out of scope unless a later story/spec adds it.
 
 ## 14. Human Review Checklist
 
 - [ ] Matrix matches **1a** spec table exactly.
 - [ ] **`If-Match`** parity with **PATCH** behavior.
+- [ ] **`transitionReason`** on **`GET`** matches **1a** contract (**`null`**); no **`V1`** column added for it.
 
 ## 15. Completion Notes
 

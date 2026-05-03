@@ -4,7 +4,7 @@
 
 ## 1. Status
 
-Planned
+Approved
 
 ## 2. Goal
 
@@ -37,6 +37,7 @@ Core incident data is stored reliably with correct invariants before HTTP contro
 - REST controllers and **OpenAPI** (Stories 4–7).
 - **`ETag` / `If-Match`** HTTP headers (handled in Story 5; domain may still expose `version`).
 - **Signal ingest**, **fingerprint**, **telemetry_context**, **`created_by_rule_id`** writes.
+- Persisting **`transitionReason`** (**1a** API returns **`null`** on reads per **`api-contract.md`** / **`data-model.md`**; Story **6** validates request **`reason`** only).
 - **AI**, **RAG**, **MCP**, **Docker**, **Kubernetes**, **microservices**.
 
 ## 7. API Changes
@@ -58,16 +59,16 @@ None beyond Story **2** (uses existing **`incidents`** table).
 - [ ] Can persist a new incident as **`DRAFT`** with valid title/severity via service/repository API used by tests.
 - [ ] Invalid title/severity rejected with clear domain/service errors mappable later to **HTTP 400**.
 - [ ] **`source`** column stored as **`MANUAL`**; **1b** columns remain untouched (null).
-- [ ] **`version`** behavior documented for updates (increment on successful mutation).
+- [ ] **`version`** increment rules documented **in code** (e.g. Javadoc or class-level doc on the mutation/write path) **and** summarized in **§15 Completion Notes**: increment **only** on successful persistence of a mutating operation; initial value on create per **`V1`** / Story **2** defaults.
 
 ## 11. Test Requirements
 
 - Unit tests: validation; illegal state transitions return errors suitable for later **409** mapping.
-- Integration test (optional with Testcontainers): round-trip insert/select **MANUAL** row.
+- **At least one** persistence integration test against **PostgreSQL** (e.g. **Testcontainers**, per **`docs/adr/0001-kickoff-tooling-testing-and-1a-scope.md`**): round-trip insert/select **`MANUAL`** row; assert **`source`** and null **1b** columns as in acceptance criteria.
 
 ## 12. Files Expected to Change
 
-- **`src/main/java/**`** domain, persistence (e.g. JPA entities, JDBC, Spring Data), **`src/test/java/**`** unit tests.
+- **`src/main/java/**`** domain, persistence (e.g. JPA entities, JDBC, Spring Data), **`src/test/java/**`** unit and integration tests.
 
 ## 13. Implementation Notes
 
