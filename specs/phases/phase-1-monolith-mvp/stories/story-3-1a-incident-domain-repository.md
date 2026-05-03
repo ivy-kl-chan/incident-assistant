@@ -4,7 +4,7 @@
 
 ## 1. Status
 
-Implemented
+Reviewed
 
 ## 2. Goal
 
@@ -83,14 +83,17 @@ None beyond Story **2** (uses existing **`incidents`** table).
 
 ## 14. Human Review Checklist
 
-- [ ] State machine **documentation** in domain matches **1a** spec (actual transition operations: **Story 6**).
-- [ ] No accidental write to **1b**-reserved columns.
-- [ ] **`PATCH`**-aligned rule (**CLOSED**/**`CANCELLED`**) enforced for field updates.
-- [ ] Timestamps and **`version`** behavior match **`data-model.md`**.
+*(Required before merge.)*
+
+- [x] State machine **documentation** in domain matches **1a** spec (actual transition operations: **Story 6**).
+- [x] No accidental write to **1b**-reserved columns.
+- [x] **`PATCH`**-aligned rule (**CLOSED**/**`CANCELLED`**) enforced for field updates.
+- [x] Timestamps and **`version`** behavior match **`data-model.md`**.
 
 ## 15. Completion Notes
 
 - **Date:** 2026-05-02
 - **Summary:** Domain types, `IncidentValidator`, `ManualIncidentService`, port `ManualIncidentRepository`, and `JdbcManualIncidentRepository` (insert/update with optimistic CAS). Persistence beans are `@ConditionalOnBean(JdbcTemplate.class)` so tests that exclude `DataSource` (e.g. actuator slice) still start.
-- **Tests:** `IncidentValidatorTest`, `ManualIncidentServiceTest`, `ManualIncidentRepositoryIntegrationTest` (Testcontainers PostgreSQL; skipped when Docker unavailable via `@Testcontainers(disabledWithoutDocker = true)`).
+- **Tests:** `IncidentValidatorTest`, `ManualIncidentServiceTest`, `ManualIncidentRepositoryIntegrationTest` (Testcontainers PostgreSQL; skipped when Docker unavailable via `@Testcontainers(disabledWithoutDocker = true)`). **CI** should run the integration test (Docker); local skip without Docker is acceptable.
+- **Human review (2026-05-02):** §14 checklist completed pre-merge. Policy: optional Testcontainers may skip on dev machines without Docker; **CI** must exercise Testcontainers/DB round-trip.
 - **PR/commit:** *(none yet — local implementation)*
