@@ -30,6 +30,7 @@ This project must follow **specification-driven development**.
 
 ## Cursor project skills (`.cursor/skills/`)
 
+- **Workflow order (canonical):** Happy-path and situational skill order are documented only in **[`.cursor/skills/README.md`](../skills/README.md)**. Do not duplicate the full sequence elsewhere; link there when pointing agents or contributors at ordering.
 - **Naming:** Each skill’s directory name and YAML `name` field use **action-first** kebab-case: a **verb** (or clear verb phrase) comes first, then the object or scope (e.g. `review-spec-chat-scope`, `write-implementation-story`, `implement-story`, `decompose-phase-stories`). Do not introduce new skills that put the object before the verb (e.g. avoid `spec-review-…`, `phase-…-breakdown`).
 
 ## Story-based implementation (per phase)

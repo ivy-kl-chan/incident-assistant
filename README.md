@@ -152,6 +152,8 @@ Blocking and recommended questions from the **Summary** below are **answered**. 
 
 Use **`mvn clean verify`** before submitting changes. Follow **`specs/`** and project rules in **`.cursor/rules/`** (Cursor optional). Feature work should match the active phase story and acceptance criteria.
 
+**Cursor agents:** skill workflow order (happy path and branches) is defined only in **[`.cursor/skills/README.md`](.cursor/skills/README.md)**.
+
 ## Continuous integration
 
 **GitHub Actions** is the default CI host. Workflow: **[`.github/workflows/ci.yml`](.github/workflows/ci.yml)**.
