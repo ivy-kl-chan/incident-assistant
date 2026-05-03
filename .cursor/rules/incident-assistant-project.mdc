@@ -39,17 +39,19 @@ This project must follow **specification-driven development**.
 2. **Traceability:** Each story must reference the relevant phase spec sections (file paths or headings).
 3. **Story content:** Each story must define **scope**, **acceptance criteria**, **test requirements**, and **out-of-scope** items.
 4. **One story at a time:** Cursor implements only one story at a time.
-5. **Gate the next story:** Do not start the next story until the current story is **tested and reviewed** (per project workflow).
-6. **No opportunistic scope:** Do not implement future stories ahead of the active story.
-7. **Scoped edits:** Do not modify unrelated areas unless the active story explicitly allows it.
-8. **Status:** After implementation, update that story’s status in its artifact (e.g. draft / in progress / done).
-9. **Closed story files:** Do not edit a `specs/phases/**/stories/story-*.md` whose **`## 1. Status`** is **`Complete`** or **`Completed`** except when the user **explicitly** requests a change to that file (e.g. factual fix, required traceability). Template migrations, section renumbering, and bulk story normalization must **skip** those files. For optional status spelling, see **write-implementation-story** → Status lifecycle.
-10. **Tests:** Every story must ship tests that meet its test requirements (see core principle 15).
-11. **Phase done:** A phase is complete only when all required stories are complete **and** phase acceptance criteria pass.
+5. **Prerequisites in the codebase:** When the active story lists prior work in **`## 5. Prerequisites, dependencies, and blocked by`**, confirm those prerequisite **deliverables exist in the current branch/working tree** (types, migrations, wiring, APIs)—not only that prerequisite **`## 1. Status`** looks complete. If the baseline is wrong (unmerged prerequisite commits, wrong branch, partial history), reconcile **before** implementation starts.
+6. **Gate the next story:** Do not start the next story until the current story is **tested and reviewed** (per project workflow).
+7. **No opportunistic scope:** Do not implement future stories ahead of the active story.
+8. **Scoped edits:** Do not modify unrelated areas unless the active story explicitly allows it.
+9. **Status:** After implementation, update that story’s status in its artifact (e.g. draft / in progress / done).
+10. **Closed story files:** Do not edit a `specs/phases/**/stories/story-*.md` whose **`## 1. Status`** is **`Complete`** or **`Completed`** except when the user **explicitly** requests a change to that file (e.g. factual fix, required traceability). Template migrations, section renumbering, and bulk story normalization must **skip** those files. For optional status spelling, see **write-implementation-story** → Status lifecycle.
+11. **Tests:** Every story must ship tests that meet its test requirements (see core principle 15).
+12. **Phase done:** A phase is complete only when all required stories are complete **and** phase acceptance criteria pass.
 
 ## Before coding, always produce
 
 - Active story (or confirmation that story breakdown is the current task)
+- When **`## 5. Prerequisites`** lists prior stories: confirmation that prerequisite **deliverables are present in the current codebase** (spot-check paths/migrations/APIs), not only prerequisite story status
 - Summary of requested work
 - Affected files
 - Proposed implementation plan aligned to the **single** active story
