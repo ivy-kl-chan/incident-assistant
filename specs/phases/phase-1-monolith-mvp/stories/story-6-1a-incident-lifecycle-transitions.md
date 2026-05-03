@@ -22,7 +22,11 @@ Operators can promote a draft to open, close an incident, or cancel from draft o
 | [`../../phase-1a-monolith-core/spec.md`](../../phase-1a-monolith-core/spec.md) | Canonical state machine |
 | [`../../phase-1a-monolith-core/test-plan.md`](../../phase-1a-monolith-core/test-plan.md) | Transition matrix unit tests; **412** on transitions |
 
-## 5. In Scope
+## 5. Prerequisites, dependencies, and blocked by
+
+- **[Story 4](story-4-1a-incidents-post-get-list.md)** and **[Story 5](story-5-1a-incidents-patch-etag-concurrency.md)** — HTTP incident CRUD and optimistic concurrency **`If-Match` / `ETag`** before **`POST .../transitions`**.
+
+## 6. In Scope
 
 - **`POST /api/v1/incidents/{id}/transitions`** with **`If-Match`** required.
 - Body: **`{ "to": "OPEN" | "CLOSED" | "CANCELLED", "reason"?: string ≤500 }`**.
@@ -30,49 +34,49 @@ Operators can promote a draft to open, close an incident, or cancel from draft o
 - **404** if id missing; **409** if transition illegal from current status; **412** if **`If-Match`** stale; **400** for bad JSON, wrong enum, missing **`to`**, **`reason`** too long.
 - Persist **`transitionReason`** (or equivalent “last transition reason”) on **`Incident`** read model per **1a** contract.
 
-## 6. Out of Scope
+## 7. Out of Scope
 
 - **Automatic** transitions from signals (**1b**).
 - **Problem Details** completeness (Story 7).
 - **AI**, **RAG**, **MCP**, **Docker**, **Kubernetes**, **microservices**.
 
-## 7. API Changes
+## 8. API Changes
 
 - **New:** `POST /api/v1/incidents/{id}/transitions`.
 
-## 8. Data Model Changes
+## 9. Data Model Changes
 
 Optional column for last transition reason if not already in **V1**—should be covered by **1a** `Incident` **`transitionReason`** (verify **V1** DDL vs contract; adjust Story **2** if discovery shows gap—human gate).
 
-## 9. Business Rules
+## 10. Business Rules
 
 - Same optimistic concurrency as **PATCH**: **`ETag`**/**`version`** drives **`If-Match`**.
 - Terminal states cannot transition further in v1.
 
-## 10. Acceptance Criteria
+## 11. Acceptance Criteria
 
 - [ ] Each allowed transition returns success with updated **`status`**, **`version`**, **`ETag`**, and timestamps consistent with persistence.
 - [ ] Illegal transition → **409**; unknown id → **404**; stale **`If-Match`** → **412**; malformed body → **400**.
 - [ ] **`reason`** optional; length validation enforced.
 
-## 11. Test Requirements
+## 12. Test Requirements
 
 - Unit tests: full transition matrix including illegal paths.
 - Integration tests: **`POST`→`OPEN`→`CLOSED`** with **`If-Match`** updates.
 
-## 12. Files Expected to Change
+## 13. Files Expected to Change
 
 - **`src/main/java/**`** domain/service/controller; **`src/test/java/**`**.
 
-## 13. Implementation Notes
+## 14. Implementation Notes
 
 - If **`transitionReason`** is missing from **V1**, amend Story **2** DDL before merging this story (schema correction is not “new feature migration” if done before first release).
 
-## 14. Human Review Checklist
+## 15. Human Review Checklist
 
 - [ ] Matrix matches **1a** spec table exactly.
 - [ ] **`If-Match`** parity with **PATCH** behavior.
 
-## 15. Completion Notes
+## 16. Completion Notes
 
 *(Fill when implemented.)*

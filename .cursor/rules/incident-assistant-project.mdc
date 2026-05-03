@@ -43,8 +43,9 @@ This project must follow **specification-driven development**.
 6. **No opportunistic scope:** Do not implement future stories ahead of the active story.
 7. **Scoped edits:** Do not modify unrelated areas unless the active story explicitly allows it.
 8. **Status:** After implementation, update that story’s status in its artifact (e.g. draft / in progress / done).
-9. **Tests:** Every story must ship tests that meet its test requirements (see core principle 15).
-10. **Phase done:** A phase is complete only when all required stories are complete **and** phase acceptance criteria pass.
+9. **Closed story files:** Do not edit a `specs/phases/**/stories/story-*.md` whose **`## 1. Status`** is **`Complete`** or **`Completed`** except when the user **explicitly** requests a change to that file (e.g. factual fix, required traceability). Template migrations, section renumbering, and bulk story normalization must **skip** those files. For optional status spelling, see **write-implementation-story** → Status lifecycle.
+10. **Tests:** Every story must ship tests that meet its test requirements (see core principle 15).
+11. **Phase done:** A phase is complete only when all required stories are complete **and** phase acceptance criteria pass.
 
 ## Before coding, always produce
 

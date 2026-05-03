@@ -24,49 +24,53 @@ When implemented, reviewers can validate **Journey A** with **trace**-grounded e
 | [`../../phase-1b-signal-ingest/api-contract.md`](../../phase-1b-signal-ingest/api-contract.md) | **`telemetryPointers`** and validation (extend only as spec evolves) |
 | [`../README.md`](../README.md) | **Stories** index |
 
-## 5. In Scope
+## 5. Prerequisites, dependencies, and blocked by
+
+- **Stories [10](story-10-1b-rule-registry-and-evaluators.md)–[15](story-15-1b-otel-demo-journey-a.md)** minimum; **§14** suggests completing **[Story 14](story-14-1b-test-matrix-hardening.md)** before expanding **1b-T** scope.
+
+## 6. In Scope
 
 - None until this placeholder is promoted to an active story (replace *placeholder* in title, narrow **In Scope**, and link a PR).
 
-## 6. Out of Scope
+## 7. Out of Scope
 
 - All implementation work while status remains an unchecked placeholder (use **Stories 11** and **15** for **1b-M** delivery first).
 - **1b-L** (**Story 17**).
 
-## 7. API Changes
+## 8. API Changes
 
 Deferred—define when story is activated (must remain compatible with **1b-M** contracts from Story **11**).
 
-## 8. Data Model Changes
+## 9. Data Model Changes
 
 None as placeholder; any DDL requires spec + ADR update when activated.
 
-## 9. Business Rules
+## 10. Business Rules
 
 - Must not break **1b-M** dedup, idempotency, or ingest auth semantics established in Stories **10–12**.
 
-## 10. Acceptance Criteria
+## 11. Acceptance Criteria
 
 - [ ] *(When activated)* **`implementation-plan.md`** **1b-T** row satisfied with automated tests and README subsection for trace-driven Journey A (or explicit deferral with issue link).
 
-## 11. Test Requirements
+## 12. Test Requirements
 
 - [ ] *(When activated)* Integration/unit tests per updated **`phase-1b-signal-ingest/test-plan.md`** for trace-heavy payloads.
 
-## 12. Files Expected to Change
+## 13. Files Expected to Change
 
 - *(When activated)* Rules, fixtures, **`README.md`**, **`src/main/java/**`**, **`src/test/java/**`**, possibly **`openapi-1b.yaml`** examples.
 
-## 13. Implementation Notes
+## 14. Implementation Notes
 
 - **Depends on:** Stories **10–15** minimum; prefer completing **Story 14** (**1b** automated gate) for **1b-M** before expanding evaluators for traces.
 - Split from **Story 11** intentionally to keep **1b-M** PR-sized; do not fold **1b-T** into **Story 11** without human approval.
 
-## 14. Human Review Checklist
+## 15. Human Review Checklist
 
 - [ ] Placeholder removed from title before implementation starts.
 - [ ] Specs updated before code if **1b-T** changes contract shapes.
 
-## 15. Completion Notes
+## 16. Completion Notes
 
 *(Placeholder — fill when story is activated or cancelled.)*

@@ -42,7 +42,7 @@ description: >-
 ## Workflow
 
 1. Confirm the **story file path** and **implementation evidence source** (diff/commits/PR scope).
-2. Verify story template compliance with **write-implementation-story** canonical numbered headings (`## 1. Status` … `## 15. Completion Notes`) and status lifecycle expectations.
+2. Verify story template compliance with **write-implementation-story** canonical numbered headings (`## 1. Status` … `## 16. Completion Notes`) and status lifecycle expectations—**unless** the story file predates the sixteen-section template and is **`Complete`** / **`Completed`**: then do not require renumbering or **§5** as a **blocker**; note template drift as **optional** follow-up only (see **Closed story files** in `.cursor/rules/incident-assistant-project.mdc`).
 3. Build a traceability map:
    - **In Scope** -> changed files/code paths.
    - **Acceptance Criteria** -> concrete implementation and tests.

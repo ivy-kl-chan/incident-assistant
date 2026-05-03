@@ -25,7 +25,12 @@ Matched evaluations create **signal-sourced** **draft** incidents exactly once p
 | [`../../phase-1b-signal-ingest/rules/registry.yaml`](../../phase-1b-signal-ingest/rules/registry.yaml) | Defaults for title/severity on create |
 | [`../../phase-1b-signal-ingest/implementation-plan.md`](../../phase-1b-signal-ingest/implementation-plan.md) | **1b-M** metrics-first; **1b-T** / **1b-L** → Stories **16–17** |
 
-## 5. In Scope
+## 5. Prerequisites, dependencies, and blocked by
+
+- **[Story 10](story-10-1b-rule-registry-and-evaluators.md)** — evaluators and **`registry.yaml`** binding for **`POST /api/v1/signal-ingest/evaluations`**.
+- **1a** incident HTTP and persistence — signal evaluation creates/updates incidents over the existing **1a** API and schema (Stories **1–7** as applicable).
+
+## 6. In Scope
 
 - Config **`signals.enabled`**; **404** on ingest when **`false`**.
 - **`X-Integration-Token`** vs **`SIGNAL_INGEST_TOKEN`**; **constant-time** compare; **401** on failure.
@@ -36,7 +41,7 @@ Matched evaluations create **signal-sourced** **draft** incidents exactly once p
 - Config **`SIGNAL_DEDUP_COOLDOWN`** (default **15 minutes**).
 - Integration test: **two parallel** ingests same fingerprint, empty pre-state → **exactly one** new **DRAFT** row.
 
-## 6. Out of Scope
+## 7. Out of Scope
 
 - **`Idempotency-Key`** header store and replay (**Story 12**).
 - **`GET`** incident list **`source`** filter and detail field extensions (**Story 13**).
@@ -45,21 +50,21 @@ Matched evaluations create **signal-sourced** **draft** incidents exactly once p
 - **AI**, **RAG**, **MCP**.
 - **Trace-** / **log-centric** fixture and rule expansions (**Stories 16–17**).
 
-## 7. API Changes
+## 8. API Changes
 
 - **New:** `POST /api/v1/signal-ingest/evaluations` (fully functional per **1b** contract except **Idempotency-Key** deferred to Story **12**).
 
-## 8. Data Model Changes
+## 9. Data Model Changes
 
 None if **V1** already included **1b** columns and partial index (Story **2**). Optional **`signal_ingest_audit`** writes—defer to Story **12** if treated as optional.
 
-## 9. Business Rules
+## 10. Business Rules
 
 - **Normative ingest algorithm** steps **1–6** in **1b** `data-model.md` (**Option A** only unless ADR for **Option B**).
 - **Fingerprint** canonicalization: stable sorted JSON of **`{ "ruleId", "fingerprintInputs" }`** → **SHA-256** lowercase hex (**64** chars).
 - **Telemetry** stored shape and max **8 KiB** per **1b** `data-model.md`; **no secrets** in **`deepLinks`**.
 
-## 10. Acceptance Criteria
+## 11. Acceptance Criteria
 
 - [ ] **`signals.enabled=false`** → **404** on ingest **POST**.
 - [ ] **401**/**415**/**400**/**422** cases per **`api-contract.md`** and **`test-plan.md`** covered by automated tests where practical.
@@ -69,24 +74,24 @@ None if **V1** already included **1b** columns and partial index (Story **2**). 
 - [ ] **Concurrency** integration test on **PostgreSQL** passes (parallel same fingerprint).
 - [ ] **Default CI** uses **Testcontainers PostgreSQL** for these tests (**no** mandatory external stack).
 
-## 11. Test Requirements
+## 12. Test Requirements
 
 - Unit tests: fingerprint stable across key order permutations (**1b** `test-plan.md`).
 - Integration tests: matrix spot-checks (**DRAFT** dup vs **OPEN** new episode, etc.) per **`data-model.md`** table.
 
-## 12. Files Expected to Change
+## 13. Files Expected to Change
 
 - **`src/main/java/**`** ingest controller, service, transaction boundary, JDBC/JPA repositories; **`src/test/java/**`**; **`application*.yml`**.
 
-## 13. Implementation Notes
+## 14. Implementation Notes
 
 - **`phase-1b-signal-ingest/implementation-plan.md`** orders **metrics → traces → logs**; this story delivers **1b-M** (metrics-first) contract coverage. Richer **trace**/**log** fixtures and rule behavior ship in **Stories 16–17** without changing **1b-M** response contracts established here.
 
-## 14. Human Review Checklist
+## 15. Human Review Checklist
 
 - [ ] **Option A** matrix matches **`data-model.md`** exactly.
 - [ ] Advisory key derivation documented (one approach from spec options).
 
-## 15. Completion Notes
+## 16. Completion Notes
 
 *(Fill when implemented.)*

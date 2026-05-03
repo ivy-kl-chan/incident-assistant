@@ -18,7 +18,7 @@ description: >-
 
 ## Story file format (mandatory)
 
-Before writing any `story-*.md` file, **read and follow** [write-implementation-story/SKILL.md](../write-implementation-story/SKILL.md). Phase breakdown **uses** that skill’s verbatim template: title `# Story <n>: …`, then the **fifteen** numbered `##` headings in **write-implementation-story → Canonical section headings** (`## 1. Status` through `## 15. Completion Notes`, same order, exact titles), Status lifecycle, Spec References bullets, and the checkbox blocks under **Acceptance Criteria**, **Test Requirements**, and **Human Review Checklist**. **Do not** use unnumbered section titles (e.g. `## Status` without the digit) for new or rewritten stories.
+Before writing any `story-*.md` file, **read and follow** [write-implementation-story/SKILL.md](../write-implementation-story/SKILL.md). Phase breakdown **uses** that skill’s verbatim template: title `# Story <n>: …`, then the **sixteen** numbered `##` headings in **write-implementation-story → Canonical section headings** (`## 1. Status` through `## 16. Completion Notes`, same order, exact titles), Status lifecycle, Spec References bullets, and the checkbox blocks under **Acceptance Criteria**, **Test Requirements**, and **Human Review Checklist**. **Do not** use unnumbered section titles (e.g. `## Status` without the digit) for new or rewritten stories.
 
 ## Inputs (read in order)
 
@@ -32,7 +32,7 @@ Before writing any `story-*.md` file, **read and follow** [write-implementation-
 - Create **`stories/`** under the phase folder (e.g. `specs/phases/phase-1-monolith-mvp/stories/`).
 - One file per story: **`story-<n>-<short-kebab-name>.md`** with sequential `n` starting at **1**.
 
-## Fifteen traceability areas (content checklist)
+## Sixteen traceability areas (content checklist)
 
 Each story must include **every** heading in **write-implementation-story → Canonical section headings**, in order, with no omissions. For each section, fill as follows:
 
@@ -40,23 +40,25 @@ Each story must include **every** heading in **write-implementation-story → Ca
 2. **`## 2. Goal`** — one concrete outcome for this story alone.
 3. **`## 3. User Value`** — who benefits and how (operators, reviewers, integrators).
 4. **`## 4. Spec References`** — bullets for `spec.md`, `api-contract.md`, `data-model.md`, `test-plan.md` as applicable; add `03-acceptance-criteria.md`, OpenAPI, ADRs when relevant.
-5. **`## 5. In Scope`** — deliverables for **this** story only.
-6. **`## 6. Out of Scope`** — explicit exclusions (next story / future phase).
-7. **`## 7. API Changes`** — routes, headers, status codes; **None** if not applicable.
-8. **`## 8. Data Model Changes`** — entities, migrations, constraints; **None** if not applicable.
-9. **`## 9. Business Rules`** — state, auth, validation, concurrency this story touches.
-10. **`## 10. Acceptance Criteria`** — checkboxes; objectively verifiable.
-11. **`## 11. Test Requirements`** — use write-implementation-story’s checkbox lines; tie substance to `test-plan.md` where it applies.
-12. **`## 12. Files Expected to Change`** — globs or concrete paths.
-13. **`## 13. Implementation Notes`** — ordering, dependencies, edge cases; **no code blocks** unless illustrating a contract snippet already in specs.
-14. **`## 14. Human Review Checklist`** — that skill’s checkbox block verbatim.
-15. **`## 15. Completion Notes`** — placeholder until implemented.
+5. **`## 5. Prerequisites, dependencies, and blocked by`** — prior `story-*.md` work, migrations, flags, or human/external blockers; **`None`** only when truly none; link sibling story files by path when sequencing matters.
+6. **`## 6. In Scope`** — deliverables for **this** story only.
+7. **`## 7. Out of Scope`** — explicit exclusions (next story / future phase).
+8. **`## 8. API Changes`** — routes, headers, status codes; **None** if not applicable.
+9. **`## 9. Data Model Changes`** — entities, migrations, constraints; **None** if not applicable.
+10. **`## 10. Business Rules`** — state, auth, validation, concurrency this story touches.
+11. **`## 11. Acceptance Criteria`** — checkboxes; objectively verifiable.
+12. **`## 12. Test Requirements`** — use write-implementation-story’s checkbox lines; tie substance to `test-plan.md` where it applies.
+13. **`## 13. Files Expected to Change`** — globs or concrete paths.
+14. **`## 14. Implementation Notes`** — ordering, edge cases; **no code blocks** unless illustrating a contract snippet already in specs (avoid duplicating **§5**—reference it when the prerequisite is already listed there).
+15. **`## 15. Human Review Checklist`** — that skill’s checkbox block verbatim.
+16. **`## 16. Completion Notes`** — placeholder until implemented.
 
 ## Rules
 
+- **Closed story files:** Do **not** rewrite, renumber, or add **§5** to a `story-*.md` whose **`## 1. Status`** is **`Complete`** or **`Completed`** unless the user **explicitly** names that file for an amendment. See `.cursor/rules/incident-assistant-project.mdc` (**Closed story files**). Phase decomposition may **reference** closed stories in prerequisites of **new** stories without editing the closed file.
 - **Small stories:** each story should be reviewable in one PR-sized chunk; split by vertical slice or by clear seam (schema vs HTTP vs OpenAPI vs tests).
 - **Traceability:** every **In Scope** item must map to at least one **Spec References** row; acceptance criteria must map to **03-acceptance-criteria.md** or phase spec bullets.
-- **Independence:** prefer stories that can be implemented and tested without starting the *next* story; when impossible, state **hard dependencies** in **Implementation Notes** and in the chat summary (dependency graph).
+- **Independence:** prefer stories that can be implemented and tested without starting the *next* story; when impossible, state **hard dependencies** in **`## 5. Prerequisites, dependencies, and blocked by`** (and briefly in **Implementation Notes** if nuance is needed) and in the chat summary (dependency graph).
 - **Future phases:** do not scope Phase 2+ product behavior. If a spec mentions later work, list it under **Out of Scope** or a one-line **design note** in **Implementation Notes**.
 - **Acceptance-driven exceptions:** when `03-acceptance-criteria.md` mandates a deliverable that uses a specific technology (e.g. container image, demo repro), put that work in **dedicated** story(ies) whose **Goal** cites the acceptance section by path—do not hide mandatory DoD inside unrelated stories and do not mark it “out of scope” without a documented product decision.
 
