@@ -12,9 +12,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * Registers JDBC-backed manual incident beans after {@link JdbcTemplate} is available. Using
- * auto-configuration (vs {@code @ConditionalOnBean} on {@code @Service}/{@code @Repository})
- * avoids startup ordering where component-scan conditions run before the JDBC auto-configuration
+ * Registers JDBC-backed manual incident beans after {@link JdbcTemplate} is
+ * available. Using
+ * auto-configuration (vs {@code @ConditionalOnBean} on
+ * {@code @Service}/{@code @Repository})
+ * avoids startup ordering where component-scan conditions run before the JDBC
+ * auto-configuration
  * registers {@code jdbcTemplate}.
  */
 @AutoConfiguration

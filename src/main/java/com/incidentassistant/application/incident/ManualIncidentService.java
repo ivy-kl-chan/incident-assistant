@@ -17,18 +17,28 @@ import java.time.Instant;
 import java.util.UUID;
 
 /**
- * Application service for manually created incidents ({@link IncidentSource#MANUAL} only). New rows
+ * Application service for manually created incidents
+ * ({@link IncidentSource#MANUAL} only). New rows
  * are created in {@link IncidentStatus#DRAFT}.
  *
- * <p><strong>Version:</strong> New incidents start at {@code version = 1}. Each successful field
- * update increments {@code version} by 1 in the repository (optimistic locking foundation for
+ * <p>
+ * <strong>Version:</strong> New incidents start at {@code version = 1}. Each
+ * successful field
+ * update increments {@code version} by 1 in the repository (optimistic locking
+ * foundation for
  * {@code ETag} / {@code If-Match} in the HTTP layer).
  *
- * <p><strong>Timestamps:</strong> {@code created_at} and {@code updated_at} are set from {@link
- * Clock} on insert; {@code updated_at} advances on each successful mutation that updates the row.
+ * <p>
+ * <strong>Timestamps:</strong> {@code created_at} and {@code updated_at} are
+ * set from {@link
+ * Clock} on insert; {@code updated_at} advances on each successful mutation
+ * that updates the row.
  *
- * <p>Spring registers this type from {@link com.incidentassistant.autoconfigure.IncidentJdbcAutoConfiguration}
- * once {@link org.springframework.jdbc.core.JdbcTemplate} is available (see class Javadoc there).
+ * <p>
+ * Spring registers this type from
+ * {@link com.incidentassistant.autoconfigure.IncidentJdbcAutoConfiguration}
+ * once {@link org.springframework.jdbc.core.JdbcTemplate} is available (see
+ * class Javadoc there).
  */
 public class ManualIncidentService {
 
@@ -46,27 +56,30 @@ public class ManualIncidentService {
     CreateManualIncidentCommand validated = IncidentValidator.validateCreate(command);
     Instant now = clock.instant();
     UUID id = UUID.randomUUID();
-    Incident incident =
-        new Incident(
-            id,
-            INITIAL_VERSION,
-            IncidentStatus.DRAFT,
-            validated.title(),
-            validated.description(),
-            validated.severity(),
-            IncidentSource.MANUAL,
-            now,
-            now);
+    Incident incident = new Incident(
+        id,
+        INITIAL_VERSION,
+        IncidentStatus.DRAFT,
+        validated.title(),
+        validated.description(),
+        validated.severity(),
+        IncidentSource.MANUAL,
+        now,
+        now);
     return manualIncidentRepository.insert(incident);
   }
 
   /**
-   * Applies {@link IncidentFieldPatch} per Phase 1a PATCH rules: {@code title}, {@code description},
-   * and {@code severity} may change only while status is {@link IncidentStatus#DRAFT} or {@link
+   * Applies {@link IncidentFieldPatch} per Phase 1a PATCH rules: {@code title},
+   * {@code description},
+   * and {@code severity} may change only while status is
+   * {@link IncidentStatus#DRAFT} or {@link
    * IncidentStatus#OPEN}. If status is {@link IncidentStatus#CLOSED} or {@link
-   * IncidentStatus#CANCELLED}, rejects with {@link IncidentConflictException} (HTTP 409).
+   * IncidentStatus#CANCELLED}, rejects with {@link IncidentConflictException}
+   * (HTTP 409).
    *
-   * <p>Requires {@code expectedVersion} to match the stored row; otherwise {@link
+   * <p>
+   * Requires {@code expectedVersion} to match the stored row; otherwise {@link
    * IncidentStaleVersionException} (HTTP 412 when mapped).
    */
   public Incident updateFields(UUID id, long expectedVersion, IncidentFieldPatch patch) {
@@ -75,8 +88,7 @@ public class ManualIncidentService {
     }
     IncidentFieldPatch validatedPatch = IncidentValidator.validatePatch(patch);
 
-    Incident current =
-        manualIncidentRepository.findById(id).orElseThrow(() -> new IncidentNotFoundException(id));
+    Incident current = manualIncidentRepository.findById(id).orElseThrow(() -> new IncidentNotFoundException(id));
 
     if (current.version() != expectedVersion) {
       throw new IncidentStaleVersionException("incident version mismatch");
@@ -93,10 +105,9 @@ public class ManualIncidentService {
     }
 
     String newTitle = validatedPatch.title().orElse(current.title());
-    String newDescription =
-        validatedPatch.description().isPresent()
-            ? validatedPatch.description().get()
-            : current.description();
+    String newDescription = validatedPatch.description().isPresent()
+        ? validatedPatch.description().get()
+        : current.description();
     IncidentSeverity newSeverity = validatedPatch.severity().orElse(current.severity());
 
     Instant now = clock.instant();
