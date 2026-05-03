@@ -1,6 +1,9 @@
 package com.incidentassistant.web.incident;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -30,5 +33,13 @@ class IncidentControllerWebMvcTest {
         .thenThrow(new DataAccessResourceFailureException("simulated"));
 
     mockMvc.perform(get("/api/v1/incidents/" + id)).andExpect(status().isServiceUnavailable());
+  }
+
+  @Test
+  void list_whenPersistenceFails_returns503() throws Exception {
+    when(incidentService.list(anyInt(), anyInt(), anyList(), anyBoolean()))
+        .thenThrow(new DataAccessResourceFailureException("simulated"));
+
+    mockMvc.perform(get("/api/v1/incidents")).andExpect(status().isServiceUnavailable());
   }
 }

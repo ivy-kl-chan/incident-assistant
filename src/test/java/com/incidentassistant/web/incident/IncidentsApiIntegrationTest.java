@@ -147,4 +147,26 @@ class IncidentsApiIntegrationTest extends PostgresIntegrationTest {
                 .content("{\"title\":\"x\",\"severity\":\"SEV1\"}"))
         .andExpect(status().isUnsupportedMediaType());
   }
+
+  @Test
+  void post_missingTitle_returns400() throws Exception {
+    mockMvc
+        .perform(
+            post("/api/v1/incidents")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"severity\":\"SEV1\"}"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.detail").value("title is required"));
+  }
+
+  @Test
+  void post_missingSeverity_returns400() throws Exception {
+    mockMvc
+        .perform(
+            post("/api/v1/incidents")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"title\":\"Only title\"}"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.detail").value("severity is required"));
+  }
 }
