@@ -44,22 +44,27 @@ public class JdbcManualIncidentRepository implements ManualIncidentRepository {
     if (incident.source() != IncidentSource.MANUAL) {
       throw new IllegalArgumentException("Manual repository only persists MANUAL incidents");
     }
-    jdbcTemplate.update(
-        """
-        INSERT INTO incidents (
-          id, version, status, title, description, severity, source, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """,
-        incident.id(),
-        incident.version(),
-        incident.status().name(),
-        incident.title(),
-        incident.description(),
-        incident.severity().name(),
-        IncidentSource.MANUAL.name(),
-        Timestamp.from(incident.createdAt()),
-        Timestamp.from(incident.updatedAt()));
-    return incident;
+    // Return the persisted row so created_at/updated_at match PostgreSQL TIMESTAMPTZ resolution
+    // (microseconds) and match subsequent SELECT/UPDATE ... RETURNING reads.
+    List<Incident> rows =
+        jdbcTemplate.query(
+            """
+            INSERT INTO incidents (
+              id, version, status, title, description, severity, source, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            RETURNING id, version, status, title, description, severity, source, created_at, updated_at
+            """,
+            ROW_MAPPER,
+            incident.id(),
+            incident.version(),
+            incident.status().name(),
+            incident.title(),
+            incident.description(),
+            incident.severity().name(),
+            IncidentSource.MANUAL.name(),
+            Timestamp.from(incident.createdAt()),
+            Timestamp.from(incident.updatedAt()));
+    return rows.getFirst();
   }
 
   @Override
