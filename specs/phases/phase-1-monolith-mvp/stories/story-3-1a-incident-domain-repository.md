@@ -4,7 +4,7 @@
 
 ## 1. Status
 
-Approved
+Implemented
 
 ## 2. Goal
 
@@ -56,15 +56,15 @@ None beyond Story **2** (uses existing **`incidents`** table).
 
 ## 10. Acceptance Criteria
 
-- [ ] Can persist a new incident as **`DRAFT`** with valid title/severity via service/repository API used by tests.
-- [ ] Invalid title/severity rejected with clear domain/service errors mappable later to **HTTP 400**.
-- [ ] **`source`** column stored as **`MANUAL`**; **1b** columns remain untouched (null).
-- [ ] **`version`** increment rules documented **in code** (e.g. Javadoc or class-level doc on the mutation/write path) **and** summarized in **§15 Completion Notes**: increment **only** on successful persistence of a mutating operation; initial value on create per **`V1`** / Story **2** defaults.
+- [x] Can persist a new incident as **`DRAFT`** with valid title/severity via service/repository API used by tests.
+- [x] Invalid title/severity rejected with clear domain/service errors mappable later to **HTTP 400**.
+- [x] **`source`** column stored as **`MANUAL`**; **1b** columns remain untouched (null).
+- [x] **`version`** increment rules documented **in code** (e.g. Javadoc or class-level doc on the mutation/write path) **and** summarized in **§15 Completion Notes**: increment **only** on successful persistence of a mutating operation; initial value on create per **`V1`** / Story **2** defaults.
 
 ## 11. Test Requirements
 
-- Unit tests: validation; illegal state transitions return errors suitable for later **409** mapping.
-- **At least one** persistence integration test against **PostgreSQL** (e.g. **Testcontainers**, per **`docs/adr/0001-kickoff-tooling-testing-and-1a-scope.md`**): round-trip insert/select **`MANUAL`** row; assert **`source`** and null **1b** columns as in acceptance criteria.
+- [x] Unit tests: validation; illegal state transitions return errors suitable for later **409** mapping.
+- [x] **At least one** persistence integration test against **PostgreSQL** (e.g. **Testcontainers**, per **`docs/adr/0001-kickoff-tooling-testing-and-1a-scope.md`**): round-trip insert/select **`MANUAL`** row; assert **`source`** and null **1b** columns as in acceptance criteria.
 
 ## 12. Files Expected to Change
 
@@ -81,4 +81,8 @@ None beyond Story **2** (uses existing **`incidents`** table).
 
 ## 15. Completion Notes
 
-*(Fill when implemented.)*
+- **Date:** 2026-05-02  
+- **Resolved filename:** workspace uses **`story-3-1a-incident-domain-repository.md`** (there is no `story-3-incident-domain-repository.md`).  
+- **Schema baseline:** Flyway **`V1`** is owned and documented under **[Story 2 — Flyway baseline](story-2-1a-flyway-baseline-schema.md)** (`src/main/resources/db/migration/V1__baseline_incidents_and_signal_tables.sql`). This story builds domain and manual persistence **on top** of that baseline only.  
+- **`version`:** Hibernate **`@Version`** starts at **`0`** on insert (`BIGINT DEFAULT 0`); increments **only** after a successful mutating flush (see **`ManualIncidentService`** Javadoc).  
+- **Tests:** `IncidentFieldRulesTest`, `IncidentTransitionPolicyTest`, **`ManualIncidentPersistenceIntegrationTest`** (PostgreSQL via Testcontainers); **`ActuatorHealthTest`** shares the same Postgres Testcontainers base so the context starts with Flyway + JDBC. Default CI runs **`mvn verify`** with Docker so these integration tests **execute** on **`pull_request`** / **`push`** to **`main`** (see [`README.md`](README.md) in this folder).

@@ -26,5 +26,9 @@ jobs:
           java-version: "21"
           cache: maven
 
+      # Hosted runners expose Docker; Testcontainers needs a working daemon (Phase 1a test-plan / Story 18).
+      - name: Docker available for Testcontainers
+        run: docker version
+
       - name: Maven verify
         run: mvn --batch-mode verify

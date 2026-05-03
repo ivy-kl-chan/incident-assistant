@@ -56,10 +56,10 @@ None (schema only).
 
 ## 10. Acceptance Criteria
 
-- [ ] Flyway runs on an empty PostgreSQL database and applies exactly **`V1`** (no duplicate migrations).
-- [ ] Table/column types and nullability match **1a** + **1b** data-model docs (**`telemetry_context`** **JSONB**; **`signal_ingest_audit`** / **`signal_ingest_idempotency`** present); indexes match (**1b** dedup partial index included).
-- [ ] Integration test: migration succeeds on clean DB (per **1a** `test-plan.md`: Testcontainers normative).
-- [ ] No application incident API required for this story’s gate.
+- [x] Flyway runs on an empty PostgreSQL database and applies exactly **`V1`** (no duplicate migrations).
+- [x] Table/column types and nullability match **1a** + **1b** data-model docs (**`telemetry_context`** **JSONB**; **`signal_ingest_audit`** / **`signal_ingest_idempotency`** present); indexes match (**1b** dedup partial index included).
+- [x] Integration test: migration succeeds on clean DB (per **1a** `test-plan.md`: Testcontainers normative) — Spring Boot integration tests apply **`V1`** on startup against Testcontainers PostgreSQL (see **`ManualIncidentPersistenceIntegrationTest`**, **`ActuatorHealthTest`**); run **`mvn verify`** with Docker available.
+- [x] No application incident API required for this story’s gate.
 
 ## 11. Test Requirements
 
@@ -74,6 +74,7 @@ None (schema only).
 
 - **Human-approved DDL:** **`telemetry_context`** **JSONB**; **`signal_ingest_audit`** and **`signal_ingest_idempotency`** created in **`V1`** so greenfield needs no **`V2`** before **1b** idempotency/audit stories.
 - **Human approval (this story):** Status **Approved**; **`telemetry_context`** type **JSONB** in **`V1`**; **`transitionReason`** in **`api-contract.md`** is **not** a **`V1` `incidents`** column — **1a** returns **`null`** for that field (no persistence of last transition reason in **1a**).
+- **Flyway script naming (this repo):** Use the standard **`V{version}__description.sql`** form (e.g. **`V1__baseline_…sql`**): **one** version segment, **`__`**, then a **snake_case** description of what the migration does. **Do not** use timestamp-prefixed filenames for versioned migrations—that pattern belongs to other tools; here, **the next schema change is `V2__…`, `V3__…`,** not a second filename at **`V1`**. There must be **exactly one** committed **`V1`** baseline for this greenfield line; rename or reconcile in git if the descriptive suffix changes, rather than adding a parallel **`V1`** under another name.
 
 ## 14. Human Review Checklist
 
@@ -82,4 +83,7 @@ None (schema only).
 
 ## 15. Completion Notes
 
-_(Fill when implemented.)_
+- **Date:** 2026-05-02  
+- **Artifact:** [`src/main/resources/db/migration/V1__baseline_incidents_and_signal_tables.sql`](../../../../src/main/resources/db/migration/V1__baseline_incidents_and_signal_tables.sql) — single **`V1`** script per **§5** / **`phase-1a-monolith-core/data-model.md`**.  
+- **Traceability:** Baseline ownership and CI expectations are summarized in [`stories/README.md`](README.md) so later stories (e.g. **Story 3**) reference Story **2** for DDL, not the reverse.  
+- **Verification:** **`mvn --batch-mode verify`** with Docker applies **`V1`** in integration tests; default GitHub Actions workflow runs the same (see [`.github/workflows/ci.yml`](../../../../.github/workflows/ci.yml)).

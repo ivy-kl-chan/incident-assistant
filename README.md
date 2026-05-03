@@ -52,9 +52,11 @@ Only the **health** endpoint group is exposed over HTTP. That yields:
 
 Other actuator endpoints (for example `/actuator/env`, `/actuator/metrics`) are **not** exposed by default configuration.
 
-### Readiness (interim, before PostgreSQL)
+### Database and readiness
 
-**Approved interim behavior:** Until persistence is wired (**Flyway / PostgreSQL**, later Phase 1a stories), `GET /actuator/health/readiness` returns **`200`** with aggregate **`"status":"UP"`** when the Spring application context is running. It does **not** yet verify database connectivity. After the database is configured, readiness will align with the Phase 1a contract (reflect DB availability for Docker and operations).
+The application expects **PostgreSQL** at startup (see `DATABASE_URL` / `DATABASE_USER` / `DATABASE_PASSWORD` in `src/main/resources/application.yml`, defaulting to `localhost:5432/incidentassistant`). **Flyway** applies **`V1`** on startup.
+
+`GET /actuator/health/readiness` includes **database** readiness when the datasource is configured (see Actuator health groups in `application.yml`). Run PostgreSQL locally (for example via Docker) before `mvn spring-boot:run`, or rely on integration tests with **Testcontainers** (`mvn verify` with Docker available).
 
 ### Quick checks
 

@@ -9,7 +9,7 @@ Detailed specifications were **split** so **1a** and **1b** requirements are not
 
 **Implement 1a first**, then 1b.
 
-Implementation stories (numbered in **implementation order**): Markdown files in [`stories/`](stories/) (`story-*.md`).
+Implementation stories (numbered in **implementation order**): Markdown files in [`stories/`](stories/) (`story-*.md`). Index, **Flyway `V1` ownership (Story 2)**, and **CI / Testcontainers** notes: [`stories/README.md`](stories/README.md).
 
 **CI prerequisite:** Merge **[Story 18 — PR CI with Docker for Testcontainers](stories/story-18-1a-pr-ci-docker-for-testcontainers.md)** before treating the **[Story 9](stories/story-9-1a-gate-readiness-no-ingest-route.md)** “green default CI with Testcontainers” criterion as satisfied (file number **18** reflects insert after the original **1–17** breakdown, not late-phase scope).
 
