@@ -41,7 +41,8 @@ description: >-
 2. The phase is decomposed into stories (**decompose-phase-stories** / **write-implementation-story**); the target file follows **write-implementation-story** canonical headings (`## 1. Status` … `## 16. Completion Notes`).
 3. **Single active story:** confirm which `story-*.md` is in scope; do not implement multiple stories in one pass.
 4. **Status gate:** **`## 1. Status`** should be **`Approved`** before coding. If it is `Draft` or `Planned`, stop unless the user explicitly waives the gate (same convention as **review-story-pre-implementation**). If it is **`Complete`** or **`Completed`**, **stop**—the story artifact is **closed**; do not implement or “refresh” the file unless the user explicitly requests a **doc-only** change to that file (see **Closed story files** in `.cursor/rules/incident-assistant-project.mdc`).
-5. Read the story in full and every artifact under **Spec References** (`spec.md`, `api-contract.md`, `data-model.md`, `test-plan.md`, `specs/03-acceptance-criteria.md` as cited).
+5. **Prerequisite codebase alignment:** For each prior story in **`## 5. Prerequisites, dependencies, and blocked by`**, confirm its deliverables exist in the **current branch/working tree** (types, migrations, wiring, APIs this story imports or builds on)—not only that the prerequisite **`## 1. Status`** looks done. If the baseline is wrong (unmerged prerequisite work, wrong branch, partial cherry-pick), **stop** and reconcile git history before coding.
+6. Read the story in full and every artifact under **Spec References** (`spec.md`, `api-contract.md`, `data-model.md`, `test-plan.md`, `specs/03-acceptance-criteria.md` as cited).
 
 Optional but recommended: user has run or accepts **review-story-pre-implementation** on this story before **`Approved`**.
 
@@ -85,7 +86,7 @@ Provide **after** implementation (matches project rules **After coding, always p
 Copy and track:
 
 ```
-- [ ] Preconditions satisfied (specs, single Approved story, spec refs read)
+- [ ] Preconditions satisfied (specs, single Approved story, §5 prerequisites present in codebase, spec refs read)
 - [ ] Before-coding block delivered in chat
 - [ ] Status → In Progress when coding starts
 - [ ] Code + tests scoped to story; invariants enforced
