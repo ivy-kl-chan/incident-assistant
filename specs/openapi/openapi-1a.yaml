@@ -66,14 +66,11 @@ paths:
         - $ref: "#/components/parameters/IncidentId"
       responses:
         "200":
-          description: >
-            Incident (Phase 1a wire shape). api-contract.md requires a strong ETag on this response
-            for the Phase 1a gate; the Story 4 implementation does not emit ETag yet (see Story 5).
+          description: Incident (Phase 1a wire shape) with strong ETag (quoted decimal version).
           headers:
             ETag:
-              required: false
-              description: >
-                RFC 9110 opaque entity-tag (quoted decimal version). Implemented in Story 5; omitted in Story 4.
+              required: true
+              description: RFC 9110 strong entity-tag; ASCII quote + decimal version + quote (e.g. `"7"`).
               schema: { type: string, example: '"7"' }
           content:
             application/json:
@@ -82,15 +79,56 @@ paths:
         "503": { description: Persistence unavailable }
     patch:
       tags: [Incidents]
+      summary: Partial update (If-Match required; DRAFT or OPEN only)
       parameters:
         - $ref: "#/components/parameters/IncidentId"
         - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 200
+                description:
+                  type: string
+                  nullable: true
+                  maxLength: 32768
+                severity:
+                  type: string
+                  enum: [SEV1, SEV2, SEV3, SEV4]
       responses:
-        "200": { description: OK }
-        "400": { description: Empty or invalid patch body }
+        "200":
+          description: Updated incident
+          headers:
+            ETag:
+              required: true
+              description: New strong entity-tag after version increment.
+              schema: { type: string, example: '"8"' }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Incident" }
+        "400":
+          description: Empty or invalid patch body
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MinimalError" }
         "404": { description: Not found }
-        "409": { description: Not editable }
-        "412": { description: Stale If-Match }
+        "409":
+          description: Not editable (terminal status)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MinimalError" }
+        "412":
+          description: Missing, unsupported, or stale If-Match
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MinimalError" }
         "415": { description: Unsupported media type }
   /api/v1/incidents/{id}/transitions:
     post:

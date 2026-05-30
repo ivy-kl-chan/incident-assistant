@@ -114,6 +114,9 @@ public class ManualIncidentService {
     IncidentFieldPatch validatedPatch = IncidentValidator.validatePatch(patch);
 
     Incident current = manualIncidentRepository.findById(id).orElseThrow(() -> new IncidentNotFoundException(id));
+    if (current.source() != IncidentSource.MANUAL) {
+      throw new IncidentNotFoundException(id);
+    }
 
     if (current.version() != expectedVersion) {
       throw new IncidentStaleVersionException("incident version mismatch");

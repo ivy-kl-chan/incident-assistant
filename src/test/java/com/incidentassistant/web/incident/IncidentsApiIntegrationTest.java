@@ -3,6 +3,7 @@ package com.incidentassistant.web.incident;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -16,7 +17,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -26,6 +29,7 @@ class IncidentsApiIntegrationTest extends PostgresIntegrationTest {
 
   @Autowired private MockMvc mockMvc;
   @Autowired private ObjectMapper objectMapper;
+  @Autowired private JdbcTemplate jdbcTemplate;
 
   @Test
   void postThenGet_roundTrip_1aFields() throws Exception {
@@ -53,9 +57,332 @@ class IncidentsApiIntegrationTest extends PostgresIntegrationTest {
     mockMvc
         .perform(get("/api/v1/incidents/" + id))
         .andExpect(status().isOk())
+        .andExpect(header().string(HttpHeaders.ETAG, "\"" + root.get("version").asLong() + "\""))
         .andExpect(jsonPath("$.title").value("Outage"))
         .andExpect(jsonPath("$.description").value("down"))
         .andExpect(jsonPath("$.transitionReason").doesNotExist());
+  }
+
+  @Test
+  void patch_withValidIfMatch_succeedsAndAdvancesEtag() throws Exception {
+    MvcResult created =
+        mockMvc
+            .perform(
+                post("/api/v1/incidents")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"title\":\"P\",\"severity\":\"SEV4\"}"))
+            .andExpect(status().isCreated())
+            .andReturn();
+    JsonNode createdJson = objectMapper.readTree(created.getResponse().getContentAsString());
+    UUID id = UUID.fromString(createdJson.get("id").asText());
+
+    MvcResult got = mockMvc.perform(get("/api/v1/incidents/" + id)).andExpect(status().isOk()).andReturn();
+    String etag1 = got.getResponse().getHeader(HttpHeaders.ETAG);
+
+    mockMvc
+        .perform(
+            patch("/api/v1/incidents/" + id)
+                .header(HttpHeaders.IF_MATCH, etag1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"title\":\"Patched\"}"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.title").value("Patched"))
+        .andExpect(jsonPath("$.version").value(2))
+        .andExpect(header().string(HttpHeaders.ETAG, "\"2\""));
+  }
+
+  @Test
+  void patch_staleIfMatch_returns412() throws Exception {
+    MvcResult created =
+        mockMvc
+            .perform(
+                post("/api/v1/incidents")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"title\":\"S\",\"severity\":\"SEV3\"}"))
+            .andExpect(status().isCreated())
+            .andReturn();
+    JsonNode createdJson = objectMapper.readTree(created.getResponse().getContentAsString());
+    UUID id = UUID.fromString(createdJson.get("id").asText());
+    String etag1 = createdJson.get("version").asText();
+    mockMvc
+        .perform(
+            patch("/api/v1/incidents/" + id)
+                .header(HttpHeaders.IF_MATCH, "\"" + etag1 + "\"")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"title\":\"A\"}"))
+        .andExpect(status().isOk());
+
+    mockMvc
+        .perform(
+            patch("/api/v1/incidents/" + id)
+                .header(HttpHeaders.IF_MATCH, "\"" + etag1 + "\"")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"title\":\"B\"}"))
+        .andExpect(status().isPreconditionFailed())
+        .andExpect(jsonPath("$.detail").exists());
+  }
+
+  @Test
+  void patch_missingIfMatch_returns412() throws Exception {
+    MvcResult created =
+        mockMvc
+            .perform(
+                post("/api/v1/incidents")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"title\":\"M\",\"severity\":\"SEV2\"}"))
+            .andExpect(status().isCreated())
+            .andReturn();
+    UUID id =
+        UUID.fromString(
+            objectMapper.readTree(created.getResponse().getContentAsString()).get("id").asText());
+
+    mockMvc
+        .perform(
+            patch("/api/v1/incidents/" + id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"title\":\"X\"}"))
+        .andExpect(status().isPreconditionFailed());
+  }
+
+  @Test
+  void patch_ifMatchStar_returns412() throws Exception {
+    MvcResult created =
+        mockMvc
+            .perform(
+                post("/api/v1/incidents")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"title\":\"Star\",\"severity\":\"SEV2\"}"))
+            .andExpect(status().isCreated())
+            .andReturn();
+    UUID id =
+        UUID.fromString(
+            objectMapper.readTree(created.getResponse().getContentAsString()).get("id").asText());
+
+    mockMvc
+        .perform(
+            patch("/api/v1/incidents/" + id)
+                .header(HttpHeaders.IF_MATCH, "*")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"title\":\"X\"}"))
+        .andExpect(status().isPreconditionFailed());
+  }
+
+  @Test
+  void patch_onClosed_returns409() throws Exception {
+    MvcResult created =
+        mockMvc
+            .perform(
+                post("/api/v1/incidents")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"title\":\"ClosedRow\",\"severity\":\"SEV1\"}"))
+            .andExpect(status().isCreated())
+            .andReturn();
+    JsonNode j = objectMapper.readTree(created.getResponse().getContentAsString());
+    UUID id = UUID.fromString(j.get("id").asText());
+    String etag = "\"" + j.get("version").asText() + "\"";
+
+    jdbcTemplate.update("UPDATE incidents SET status = 'CLOSED' WHERE id = ?", id);
+
+    mockMvc
+        .perform(
+            patch("/api/v1/incidents/" + id)
+                .header(HttpHeaders.IF_MATCH, etag)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"title\":\"Nope\"}"))
+        .andExpect(status().isConflict());
+  }
+
+  @Test
+  void patch_emptyObject_returns400() throws Exception {
+    MvcResult created =
+        mockMvc
+            .perform(
+                post("/api/v1/incidents")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"title\":\"E\",\"severity\":\"SEV4\"}"))
+            .andExpect(status().isCreated())
+            .andReturn();
+    JsonNode createdJson = objectMapper.readTree(created.getResponse().getContentAsString());
+    UUID id = UUID.fromString(createdJson.get("id").asText());
+    String etag = createdJson.get("version").asText();
+
+    mockMvc
+        .perform(
+            patch("/api/v1/incidents/" + id)
+                .header(HttpHeaders.IF_MATCH, "\"" + etag + "\"")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void patch_wrongIfMatch_returns412() throws Exception {
+    MvcResult created =
+        mockMvc
+            .perform(
+                post("/api/v1/incidents")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"title\":\"W\",\"severity\":\"SEV3\"}"))
+            .andExpect(status().isCreated())
+            .andReturn();
+    UUID id =
+        UUID.fromString(
+            objectMapper.readTree(created.getResponse().getContentAsString()).get("id").asText());
+
+    mockMvc
+        .perform(
+            patch("/api/v1/incidents/" + id)
+                .header(HttpHeaders.IF_MATCH, "\"99\"")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"title\":\"X\"}"))
+        .andExpect(status().isPreconditionFailed())
+        .andExpect(jsonPath("$.detail").exists());
+  }
+
+  @Test
+  void patch_malformedJson_returns400() throws Exception {
+    MvcResult created =
+        mockMvc
+            .perform(
+                post("/api/v1/incidents")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"title\":\"J\",\"severity\":\"SEV4\"}"))
+            .andExpect(status().isCreated())
+            .andReturn();
+    UUID id =
+        UUID.fromString(
+            objectMapper.readTree(created.getResponse().getContentAsString()).get("id").asText());
+
+    mockMvc
+        .perform(
+            patch("/api/v1/incidents/" + id)
+                .header(HttpHeaders.IF_MATCH, "\"1\"")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{not-json"))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void patch_unknownField_returns400() throws Exception {
+    MvcResult created =
+        mockMvc
+            .perform(
+                post("/api/v1/incidents")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"title\":\"U\",\"severity\":\"SEV4\"}"))
+            .andExpect(status().isCreated())
+            .andReturn();
+    UUID id =
+        UUID.fromString(
+            objectMapper.readTree(created.getResponse().getContentAsString()).get("id").asText());
+
+    mockMvc
+        .perform(
+            patch("/api/v1/incidents/" + id)
+                .header(HttpHeaders.IF_MATCH, "\"1\"")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"foo\":\"bar\"}"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.detail").value(org.hamcrest.Matchers.containsString("unknown field")));
+  }
+
+  @Test
+  void patch_nonObjectJson_returns400() throws Exception {
+    MvcResult created =
+        mockMvc
+            .perform(
+                post("/api/v1/incidents")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"title\":\"A\",\"severity\":\"SEV4\"}"))
+            .andExpect(status().isCreated())
+            .andReturn();
+    UUID id =
+        UUID.fromString(
+            objectMapper.readTree(created.getResponse().getContentAsString()).get("id").asText());
+
+    mockMvc
+        .perform(
+            patch("/api/v1/incidents/" + id)
+                .header(HttpHeaders.IF_MATCH, "\"1\"")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("[]"))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void patch_onCancelled_returns409() throws Exception {
+    MvcResult created =
+        mockMvc
+            .perform(
+                post("/api/v1/incidents")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"title\":\"CancelledRow\",\"severity\":\"SEV2\"}"))
+            .andExpect(status().isCreated())
+            .andReturn();
+    JsonNode j = objectMapper.readTree(created.getResponse().getContentAsString());
+    UUID id = UUID.fromString(j.get("id").asText());
+    String etag = "\"" + j.get("version").asText() + "\"";
+
+    jdbcTemplate.update("UPDATE incidents SET status = 'CANCELLED' WHERE id = ?", id);
+
+    mockMvc
+        .perform(
+            patch("/api/v1/incidents/" + id)
+                .header(HttpHeaders.IF_MATCH, etag)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"title\":\"Nope\"}"))
+        .andExpect(status().isConflict());
+  }
+
+  @Test
+  void patch_onOpen_succeeds() throws Exception {
+    MvcResult created =
+        mockMvc
+            .perform(
+                post("/api/v1/incidents")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"title\":\"OpenRow\",\"severity\":\"SEV3\"}"))
+            .andExpect(status().isCreated())
+            .andReturn();
+    JsonNode j = objectMapper.readTree(created.getResponse().getContentAsString());
+    UUID id = UUID.fromString(j.get("id").asText());
+    String etag = "\"" + j.get("version").asText() + "\"";
+
+    jdbcTemplate.update("UPDATE incidents SET status = 'OPEN' WHERE id = ?", id);
+
+    mockMvc
+        .perform(
+            patch("/api/v1/incidents/" + id)
+                .header(HttpHeaders.IF_MATCH, etag)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"title\":\"OpenPatched\"}"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.title").value("OpenPatched"))
+        .andExpect(jsonPath("$.status").value("OPEN"))
+        .andExpect(jsonPath("$.version").value(2));
+  }
+
+  @Test
+  void patch_wrongContentType_returns415() throws Exception {
+    MvcResult created =
+        mockMvc
+            .perform(
+                post("/api/v1/incidents")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"title\":\"Ct\",\"severity\":\"SEV4\"}"))
+            .andExpect(status().isCreated())
+            .andReturn();
+    UUID id =
+        UUID.fromString(
+            objectMapper.readTree(created.getResponse().getContentAsString()).get("id").asText());
+
+    mockMvc
+        .perform(
+            patch("/api/v1/incidents/" + id)
+                .header(HttpHeaders.IF_MATCH, "\"1\"")
+                .contentType(MediaType.TEXT_PLAIN)
+                .content("{\"title\":\"x\"}"))
+        .andExpect(status().isUnsupportedMediaType());
   }
 
   @Test
