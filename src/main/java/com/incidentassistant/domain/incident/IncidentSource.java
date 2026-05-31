@@ -5,5 +5,7 @@ package com.incidentassistant.domain.incident;
  * are Phase 1b.
  */
 public enum IncidentSource {
-  MANUAL
+  MANUAL,
+  /** Phase 1b signal-ingest rows; not writable via Phase 1a manual APIs. */
+  SIGNAL
 }

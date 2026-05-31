@@ -52,6 +52,11 @@ class IncidentValidatorTest {
   }
 
   @Test
+  void validateDescription_emptyStringBecomesNull() {
+    assertThat(IncidentValidator.validateDescription("   ")).isNull();
+  }
+
+  @Test
   void validateCreate_validatesAllFields() {
     CreateManualIncidentCommand cmd =
         new CreateManualIncidentCommand("ok", null, IncidentSeverity.SEV2);

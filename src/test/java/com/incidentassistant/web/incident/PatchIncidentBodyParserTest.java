@@ -46,4 +46,59 @@ class PatchIncidentBodyParserTest {
     IncidentFieldPatch p = PatchIncidentBodyParser.parse(mapper.readTree("{\"severity\":\"SEV2\"}"));
     assertThat(p.severity()).contains(IncidentSeverity.SEV2);
   }
+
+  @Test
+  void nullRoot_throws() {
+    assertThatThrownBy(() -> PatchIncidentBodyParser.parse(null))
+        .isInstanceOf(IncidentValidationException.class)
+        .hasMessageContaining("JSON object");
+  }
+
+  @Test
+  void jsonNull_throws() throws Exception {
+    assertThatThrownBy(() -> PatchIncidentBodyParser.parse(mapper.nullNode()))
+        .isInstanceOf(IncidentValidationException.class)
+        .hasMessageContaining("JSON object");
+  }
+
+  @Test
+  void invalidTitle_throws() throws Exception {
+    assertThatThrownBy(() -> PatchIncidentBodyParser.parse(mapper.readTree("{\"title\":null}")))
+        .isInstanceOf(IncidentValidationException.class)
+        .hasMessageContaining("title");
+    assertThatThrownBy(() -> PatchIncidentBodyParser.parse(mapper.readTree("{\"title\":1}")))
+        .isInstanceOf(IncidentValidationException.class)
+        .hasMessageContaining("title");
+  }
+
+  @Test
+  void description_parsedAndValidated() throws Exception {
+    IncidentFieldPatch cleared =
+        PatchIncidentBodyParser.parse(mapper.readTree("{\"description\":\"\"}"));
+    assertThat(cleared.description()).contains("");
+
+    IncidentFieldPatch withText =
+        PatchIncidentBodyParser.parse(mapper.readTree("{\"description\":\"note\"}"));
+    assertThat(withText.description()).contains("note");
+
+    assertThatThrownBy(() -> PatchIncidentBodyParser.parse(mapper.readTree("{\"description\":null}")))
+        .isInstanceOf(IncidentValidationException.class)
+        .hasMessageContaining("description");
+    assertThatThrownBy(() -> PatchIncidentBodyParser.parse(mapper.readTree("{\"description\":1}")))
+        .isInstanceOf(IncidentValidationException.class)
+        .hasMessageContaining("description");
+  }
+
+  @Test
+  void invalidSeverity_throws() throws Exception {
+    assertThatThrownBy(() -> PatchIncidentBodyParser.parse(mapper.readTree("{\"severity\":null}")))
+        .isInstanceOf(IncidentValidationException.class)
+        .hasMessageContaining("severity");
+    assertThatThrownBy(() -> PatchIncidentBodyParser.parse(mapper.readTree("{\"severity\":1}")))
+        .isInstanceOf(IncidentValidationException.class)
+        .hasMessageContaining("severity");
+    assertThatThrownBy(() -> PatchIncidentBodyParser.parse(mapper.readTree("{\"severity\":\"BAD\"}")))
+        .isInstanceOf(IncidentValidationException.class)
+        .hasMessageContaining("SEV1");
+  }
 }
