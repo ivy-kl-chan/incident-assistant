@@ -22,6 +22,7 @@ import com.incidentassistant.domain.incident.ManualIncidentRepository;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -85,6 +86,62 @@ class ManualIncidentServiceTest {
   }
 
   @Test
+  void getForApi_returnsManualIncident() {
+    UUID id = UUID.randomUUID();
+    Incident manual =
+        new Incident(
+            id,
+            1L,
+            IncidentStatus.OPEN,
+            "t",
+            null,
+            IncidentSeverity.SEV1,
+            IncidentSource.MANUAL,
+            T0,
+            T0);
+    when(repository.findById(id)).thenReturn(Optional.of(manual));
+
+    assertThat(service.getForApi(id)).isEqualTo(manual);
+  }
+
+  @Test
+  void getForApi_notFoundWhenMissing() {
+    UUID id = UUID.randomUUID();
+    when(repository.findById(id)).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> service.getForApi(id)).isInstanceOf(IncidentNotFoundException.class);
+  }
+
+  @Test
+  void getForApi_notFoundWhenNonManual() {
+    UUID id = UUID.randomUUID();
+    Incident signal =
+        new Incident(
+            id,
+            1L,
+            IncidentStatus.DRAFT,
+            "t",
+            null,
+            IncidentSeverity.SEV1,
+            IncidentSource.SIGNAL,
+            T0,
+            T0);
+    when(repository.findById(id)).thenReturn(Optional.of(signal));
+
+    assertThatThrownBy(() -> service.getForApi(id)).isInstanceOf(IncidentNotFoundException.class);
+  }
+
+  @Test
+  void list_delegatesToRepository() {
+    when(repository.findManualIncidentsPage(0, 20, List.of(), false))
+        .thenReturn(new com.incidentassistant.domain.incident.IncidentPage(List.of(), 0, 0, 20));
+
+    service.list(0, 20, List.of(), false);
+
+    verify(repository).findManualIncidentsPage(0, 20, List.of(), false);
+  }
+
+  @Test
   void updateFields_rejectsWhenClosedOrCancelled() {
     UUID id = UUID.randomUUID();
     Incident closed =
@@ -114,6 +171,74 @@ class ManualIncidentServiceTest {
   }
 
   @Test
+  void updateFields_rejectsClosedDescriptionChange() {
+    UUID id = UUID.randomUUID();
+    Incident closed =
+        new Incident(
+            id,
+            2L,
+            IncidentStatus.CLOSED,
+            "t",
+            "d",
+            IncidentSeverity.SEV1,
+            IncidentSource.MANUAL,
+            T0,
+            T0);
+    when(repository.findById(id)).thenReturn(Optional.of(closed));
+
+    assertThatThrownBy(
+            () ->
+                service.updateFields(
+                    id,
+                    2L,
+                    new IncidentFieldPatch(
+                        Optional.empty(), Optional.of("new"), Optional.empty())))
+        .isInstanceOf(IncidentConflictException.class)
+        .hasMessageContaining("CLOSED");
+  }
+
+  @Test
+  void updateFields_rejectsClosedSeverityChange() {
+    UUID id = UUID.randomUUID();
+    Incident closed =
+        new Incident(
+            id,
+            2L,
+            IncidentStatus.CLOSED,
+            "t",
+            null,
+            IncidentSeverity.SEV1,
+            IncidentSource.MANUAL,
+            T0,
+            T0);
+    when(repository.findById(id)).thenReturn(Optional.of(closed));
+
+    assertThatThrownBy(
+            () ->
+                service.updateFields(
+                    id,
+                    2L,
+                    new IncidentFieldPatch(
+                        Optional.empty(), Optional.empty(), Optional.of(IncidentSeverity.SEV2))))
+        .isInstanceOf(IncidentConflictException.class)
+        .hasMessageContaining("CLOSED");
+  }
+
+  @Test
+  void updateFields_notFoundWhenMissing() {
+    UUID id = UUID.randomUUID();
+    when(repository.findById(id)).thenReturn(Optional.empty());
+
+    assertThatThrownBy(
+            () ->
+                service.updateFields(
+                    id,
+                    1L,
+                    new IncidentFieldPatch(Optional.of("x"), Optional.empty(), Optional.empty())))
+        .isInstanceOf(IncidentNotFoundException.class);
+  }
+
+  @Test
   void updateFields_rejectsCancelledSeverityChange() {
     UUID id = UUID.randomUUID();
     Incident cancelled =
@@ -138,6 +263,94 @@ class ManualIncidentServiceTest {
                         Optional.empty(), Optional.empty(), Optional.of(IncidentSeverity.SEV2))))
         .isInstanceOf(IncidentConflictException.class)
         .hasMessageContaining("CANCELLED");
+  }
+
+  @Test
+  void updateFields_notFoundWhenNonManual() {
+    UUID id = UUID.randomUUID();
+    Incident signal =
+        new Incident(
+            id,
+            1L,
+            IncidentStatus.DRAFT,
+            "t",
+            null,
+            IncidentSeverity.SEV1,
+            IncidentSource.SIGNAL,
+            T0,
+            T0);
+    when(repository.findById(id)).thenReturn(Optional.of(signal));
+
+    assertThatThrownBy(
+            () ->
+                service.updateFields(
+                    id,
+                    1L,
+                    new IncidentFieldPatch(Optional.of("x"), Optional.empty(), Optional.empty())))
+        .isInstanceOf(IncidentNotFoundException.class);
+  }
+
+  @Test
+  void updateFields_throwsStaleWhenExpectedVersionMismatch() {
+    UUID id = UUID.randomUUID();
+    Incident draft =
+        new Incident(
+            id,
+            2L,
+            IncidentStatus.DRAFT,
+            "old",
+            null,
+            IncidentSeverity.SEV1,
+            IncidentSource.MANUAL,
+            T0,
+            T0);
+    when(repository.findById(id)).thenReturn(Optional.of(draft));
+
+    assertThatThrownBy(
+            () ->
+                service.updateFields(
+                    id,
+                    1L,
+                    new IncidentFieldPatch(Optional.of("new"), Optional.empty(), Optional.empty())))
+        .isInstanceOf(IncidentStaleVersionException.class);
+  }
+
+  @Test
+  void updateFields_appliesDescriptionWhenDraft() {
+    UUID id = UUID.randomUUID();
+    Incident draft =
+        new Incident(
+            id,
+            1L,
+            IncidentStatus.DRAFT,
+            "old",
+            "before",
+            IncidentSeverity.SEV1,
+            IncidentSource.MANUAL,
+            T0,
+            T0);
+    Incident updated =
+        new Incident(
+            id,
+            2L,
+            IncidentStatus.DRAFT,
+            "old",
+            "after",
+            IncidentSeverity.SEV1,
+            IncidentSource.MANUAL,
+            T0,
+            T0);
+    when(repository.findById(id)).thenReturn(Optional.of(draft));
+    when(repository.updateFields(eq(id), eq(1L), eq("old"), eq("after"), eq(IncidentSeverity.SEV1), eq(T0)))
+        .thenReturn(Optional.of(updated));
+
+    Incident out =
+        service.updateFields(
+            id,
+            1L,
+            new IncidentFieldPatch(Optional.empty(), Optional.of("after"), Optional.empty()));
+
+    assertThat(out.description()).isEqualTo("after");
   }
 
   @Test
