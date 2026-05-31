@@ -1,6 +1,8 @@
 package com.incidentassistant.web.incident;
 
+import com.incidentassistant.domain.incident.IncidentConflictException;
 import com.incidentassistant.domain.incident.IncidentNotFoundException;
+import com.incidentassistant.domain.incident.IncidentStaleVersionException;
 import com.incidentassistant.domain.incident.IncidentValidationException;
 import java.util.Map;
 import org.springframework.dao.DataAccessException;
@@ -27,6 +29,17 @@ public class ApiExceptionHandler {
   @ExceptionHandler(IncidentValidationException.class)
   public ResponseEntity<Map<String, String>> badRequest(IncidentValidationException ex) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("detail", ex.getMessage()));
+  }
+
+  @ExceptionHandler(IncidentConflictException.class)
+  public ResponseEntity<Map<String, String>> conflict(IncidentConflictException ex) {
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("detail", ex.getMessage()));
+  }
+
+  @ExceptionHandler(IncidentStaleVersionException.class)
+  public ResponseEntity<Map<String, String>> preconditionFailed(IncidentStaleVersionException ex) {
+    return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED)
+        .body(Map.of("detail", ex.getMessage() != null ? ex.getMessage() : "Precondition failed"));
   }
 
   @ExceptionHandler(HttpMessageNotReadableException.class)

@@ -33,6 +33,8 @@ From the repository root:
 mvn clean verify
 ```
 
+After a successful run, open the JaCoCo HTML report at `target/site/jacoco/index.html` (or run `mvn jacoco:report` after `mvn test`). The project does not enforce coverage thresholds.
+
 ### Running Testcontainers locally (Docker Desktop)
 
 Use this checklist when integration tests are skipped with `disabledWithoutDocker is true and Docker is not available`.
@@ -107,7 +109,8 @@ curl -sSf http://localhost:8080/actuator/health/readiness
 Normative contract: **[`specs/phases/phase-1a-monolith-core/api-contract.md`](specs/phases/phase-1a-monolith-core/api-contract.md)**.
 
 - **`POST /api/v1/incidents`** — JSON body (`application/json`); creates **`DRAFT`** / **`MANUAL`** incidents only.
-- **`GET /api/v1/incidents/{id}`** — **`404`** if missing; **`ETag`** on this response is added in a later story (Story 5).
+- **`GET /api/v1/incidents/{id}`** — **`404`** if missing; response includes a strong **`ETag`** (quoted decimal `version`, e.g. **`"1"`**).
+- **`PATCH /api/v1/incidents/{id}`** — JSON body with at least one of **`title`**, **`description`**, **`severity`**; **`If-Match`** required and must match current **`ETag`**; wrong/missing/unsupported wildcard → **`412`**; edits only in **`DRAFT`** or **`OPEN`** → **`409`** on terminal statuses.
 - **`GET /api/v1/incidents`** — paginated list (`page`, `size`, optional `status`, `sort`); unknown query parameters → **`400`** (including `source` in 1a).
 - **`X-Request-Id`** — echoed when the client sends it; otherwise generated per response.
 - **POST body size** — max **1 MiB** via **`server.tomcat.max-http-form-post-size`**; larger payloads → **`413`** from the container.

@@ -12,6 +12,7 @@ import com.incidentassistant.domain.incident.CreateManualIncidentCommand;
 import com.incidentassistant.domain.incident.Incident;
 import com.incidentassistant.domain.incident.IncidentConflictException;
 import com.incidentassistant.domain.incident.IncidentFieldPatch;
+import com.incidentassistant.domain.incident.IncidentNotFoundException;
 import com.incidentassistant.domain.incident.IncidentSeverity;
 import com.incidentassistant.domain.incident.IncidentSource;
 import com.incidentassistant.domain.incident.IncidentStaleVersionException;
